@@ -1,0 +1,99 @@
+MVP Goals
+---------
+Mike - MVP Art
+Adam - MVP Mechanics
+Corey - Paper Design
+Chris - HUD Exploration, SFX
+
+MVP
+---
+Art
+	Backdrop
+	Ship - Magnet
+	Ship - Enemy
+	Projectiles
+	General Rubbish
+	Turrets
+	Propulsion
+
+Mechanics
+	Movement / Shooting
+	Magnetism
+	Health
+	Enemy Waves
+	Enemy AI
+	Dynamic Ships
+	Design Tools
+
+
+Mechanics (Ordered)
+---------------------
+Weapon Types (Rockets, Projectiles, Jettison Parts)
+Engine Types
+Armor (Heavy Pieces)
+Shields (Energy Sphere, Cone, Orbiting Debris)
+Debris Cleanup
+Enemies Can Pickup Items
+Win State (Planet Sized Ship?)
+Lose State
+Debug Cheat - Restart Button
+Debug Cheat - Invulnerable
+Debug Cheat - Add / Remove Debris
+Debug Cheat - Add / Remove Weapons
+Debug Cheat - Add / Remove Engines
+Debug Cheat - Spawn Enemy
+Debug Cheat - Spawn Debris
+Pause Menu
+Rotational Control
+Collision Damage
+Negative Debris
+Mass Encumberance
+Planets
+Gravity Wells (Pulls Off Parts)
+Fluid Start
+Fluid Gameplay Reset
+Free Floating Debris
+Main Menu
+How to Play Screen
+===================================
+Physics Joints
+Restart Menu
+Score Mechanic
+UI Cues for Enemies / Items
+Powerups (Temporary Components)
+Powerdowns
+Environmental Effects
+Final Boss
+Wormholes
+Walls / Small Spaces to Fit Through
+Enemy Creatures
+Score Summary
+Replay / Scrubbing
+Auto Play / Screen Saver Mode
+Cheat Codes
+
+
+Big Open Questions
+------------------
+Player Rotation
+HUD
+Lighting
+
+
+Polish / Juice
+------------------------
+Sound Effects
+Background Music
+Screen Shake
+Idle Animations
+Weapon Animations
+Dissolve Shader
+Distortion Shader
+Fancier Camera
+Blood / Color Splatter
+Cosmetic Creatures
+Star / Lighting
+Reactive Audio
+Randomized Debris Sizes
+Randomized SFX
+VFX
