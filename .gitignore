@@ -1,3 +1,7 @@
 /game/Library
 /game/Logs
 /game/Temp
+/game/obj
+/game/.vs
+/game/*.csproj
+/game/*.sln
