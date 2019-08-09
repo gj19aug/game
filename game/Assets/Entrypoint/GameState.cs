@@ -8,8 +8,7 @@ public struct GameState
 
 public struct MoveState
 {
-    public Vector2 position;
-    public Vector2 velocity;
-    public Vector2 acceleration;
-    public Vector2 throttle;
+    public Vector2 p;
+    public Vector2 dp;
+    public Vector2 input;
 }
