@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 public struct GameState
 {
     public MoveState playerMove;
+    public Vector3 playerAim;
 }
 
 public struct MoveState
 {
-    public Vector2 p;
-    public Vector2 dp;
-    public Vector2 input;
+    public Vector3 p;
+    public Vector3 dp;
+    public Vector3 input;
 }
