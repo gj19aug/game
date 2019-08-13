@@ -64,6 +64,9 @@ public class Entrypoint : MonoBehaviour
         // TODO: Replace transform references
         player.transform.position = mv.p;
 
+        // Camera
+        camera.transform.position = Vector3.Lerp(camera.transform.position, mv.p, camera.spec.lerpFactor);
+
         // Shooting
         for (int i = 0; i < state.playerInput.events.Count; i++)
         {

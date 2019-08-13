@@ -17,15 +17,15 @@ Art
 	Projectiles
 
 Mechanics
-	Movement
-	Shooting
-	Basic Camera
-	Magnetism
-	Health
-	Enemy Waves
-	Enemy AI
-	Dynamic Ships
-	Design Tools
+	[+] Movement
+	{+} Shooting
+	[+] Basic Camera
+	[ ] Magnetism
+	[ ] Health
+	[ ] Enemy Waves
+	[ ] Enemy AI
+	[ ] Dynamic Ships
+	[ ] Design Tools
 
 
 Mechanics (Ordered)
