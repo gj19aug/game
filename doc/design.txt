@@ -8,16 +8,18 @@ Chris - HUD Exploration, SFX
 MVP
 ---
 Art
-	Backdrop
+	Turrets
+	General Rubbish
 	Ship - Magnet
+	Propulsion
+	Backdrop
 	Ship - Enemy
 	Projectiles
-	General Rubbish
-	Turrets
-	Propulsion
 
 Mechanics
-	Movement / Shooting
+	Movement
+	Shooting
+	Basic Camera
 	Magnetism
 	Health
 	Enemy Waves
