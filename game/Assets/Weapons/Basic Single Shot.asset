@@ -9,7 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a61cd0a2d3e8eee42bbdce48d756b0e1, type: 3}
-  m_Name: Basic Camera Spec
+  m_Script: {fileID: 11500000, guid: d865a9a6c325efd42b6adf29e0c4f889, type: 3}
+  m_Name: Basic Single Shot
   m_EditorClassIdentifier: 
-  lerpFactor: 0.09
+  impulse: 9.5
+  lifetime: 3

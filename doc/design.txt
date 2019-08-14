@@ -18,12 +18,13 @@ Art
 
 Mechanics
 	[+] Movement
-	{+} Shooting
+	[+] Shooting
 	[+] Basic Camera
 	[ ] Magnetism
-	[ ] Health
+	[ ] Basic Collision
 	[ ] Enemy Waves
 	[ ] Enemy AI
+	[ ] Health
 	[ ] Dynamic Ships
 	[ ] Design Tools
 
