@@ -1,0 +1,15 @@
+Growth Design
+=============
+
+- Colliding with debris will attach it to your Ship.
+	- Adding a way to count total debris attached would be nice. Can use that var to feed into difficulty,score, and polish scale mechanics. 
+	- Impact Delay to require contact to persist for ~0.5(tunable) seconds before sticking.
+		- Or some other way to prevent a sharp edge from BARELY touching the ship and sticking in a weird way. 
+- All Debris just connects where it contacts the Ship, or a piece connected to the ship. 
+	- No longer affected by Magnetism or any physics?
+	- Prefer if the actual Debris itself sticks. 
+	- Guns shoot through attached pieces of Debris.
+		- Prevent bad feelings of guns becoming useless as they get buried in Debris.
+- Only objects on the Debris layer can stick.
+	- Can adjust if needed.
+

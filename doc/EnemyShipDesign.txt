@@ -1,0 +1,20 @@
+Enemy Ship Design
+=================
+
+- Enemies spawn off-camera
+	- Amount spawned based on Ship Size? Game time? Some way to scale difficulty with success (probably Ship Size)
+	- Variable to active count all AI in Game Area. (I might be able to do this myself.)
+- Enemies could shoot more than one projectile, or have more than just basic weapons decided on Spawn.
+	- Help keep it fresh
+	- Could colorize based on weapon.
+- Occasionally, spawn a wave of a large amount to throw at player. 
+- (STRETCH) Use the cockpit area drawn in EnemyFighter1 as built in "health bar". Could colorize based on Health? Green for healthy, red for dying? 
+	- Colorize the rest of the ship based on weapon type. 
+
+
+Enemy AI Flow
+================
+- Spawn
+- Find and Move to Player Postion + varRange to strafe around target. Prevent trying to collide inside Player unit. 
+- Shoot toward Player Origin while trying to maintain varRange distance. 
+- On Death, spawn variable amount of Debris.
