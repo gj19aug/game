@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+[Serializable]
 public class Pool<T> where T : MonoBehaviour
 {
     public T prefab;

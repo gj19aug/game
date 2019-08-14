@@ -5,11 +5,17 @@ using UnityEngine.Assertions;
 
 public class Entrypoint : MonoBehaviour
 {
+    // Inspector
     public PlayerRefs player;
     public new CameraRefs camera;
     public ProjectileRefs projectilePrefab;
+    public MagnetismSpec magnetism;
 
-    public GameState state;
+    // Cache
+    [HideInInspector] public Collider2D[] colliderCache;
+
+    // Game State
+    [HideInInspector] public GameState state;
 
     public static int GetKeyValue(KeyCode key)
     {
@@ -22,10 +28,13 @@ public class Entrypoint : MonoBehaviour
         state.projectilePool = new Pool<ProjectileRefs>();
         state.projectilePool.Initialize("Projectiles", projectilePrefab, 64);
         state.projectiles = new List<Projectile>(64);
+        colliderCache = new Collider2D[32];
     }
 
     void Update()
     {
+        // NOTE: Input only!
+
         // Move
         Vector3 throttle = new Vector3();
         throttle.x = GetKeyValue(KeyCode.D) - GetKeyValue(KeyCode.A);
@@ -40,12 +49,14 @@ public class Entrypoint : MonoBehaviour
         state.playerInput.aim = (mouseWS - state.playerMove.p).normalized;
 
         // Shoot
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0) | Input.GetKeyDown(KeyCode.Space))
             state.playerInput.events.Add(ShipInputEvent.Shoot);
     }
 
     void FixedUpdate()
     {
+        // NOTE: Simulate!
+
         // Movement
         float dt = Time.fixedDeltaTime;
         MoveSpec ms = player.moveSpec;
@@ -79,6 +90,7 @@ public class Entrypoint : MonoBehaviour
                     Vector3 aim = state.playerInput.aim;
 
                     ProjectileRefs pr = state.projectilePool.Spawn();
+                    pr.rigidbody.tag = Tag.Player;
                     // TODO: Ugly
                     pr.rigidbody.position = state.playerMove.p + 0.5f*(player.collider.radius + pr.collider.radius)*aim;
                     pr.rigidbody.AddForce(pr.spec.impulse * aim, ForceMode2D.Impulse);
@@ -102,6 +114,25 @@ public class Entrypoint : MonoBehaviour
                 state.projectiles.RemoveAt(i);
             }
         }
+
+        // Magnetism
+        int count = Physics2D.OverlapCircleNonAlloc(
+            state.playerMove.p,
+            magnetism.radius,
+            colliderCache,
+            magnetism.affectedLayers);
+
+        for (int i = 0; i < count; i++)
+        {
+            Rigidbody2D rb = colliderCache[i].attachedRigidbody;
+            if (rb.CompareTag(Tag.Player)) continue;
+
+            Vector3 scaledDir = state.playerMove.p - (Vector3) rb.position;
+            float dist = scaledDir.magnitude;
+            float strength = magnetism.strength * magnetism.strengthCurve.Evaluate(dist);
+            Vector3 force = scaledDir * (strength / dist);
+            rb.AddForce(force, ForceMode2D.Force);
+        }
     }
 
     #if UNITY_EDITOR
@@ -113,6 +144,12 @@ public class Entrypoint : MonoBehaviour
             Vector3 to = from + state.playerInput.aim;
             Gizmos.color = Color.green;
             Gizmos.DrawLine(from, to);
+        }
+
+        if (magnetism != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(player.transform.position, magnetism.radius);
         }
     }
     #endif

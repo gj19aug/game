@@ -153,6 +153,18 @@ MonoBehaviour:
   camera: {fileID: 519420030}
   projectilePrefab: {fileID: 4004167460313986225, guid: 76552e3c3a9fa1d4e96406d8aa608e24,
     type: 3}
+  magnetism: {fileID: 11400000, guid: b6ed92d16c3ecd142a61e6bc86e80f86, type: 2}
+  colliderCache: []
+  state:
+    playerMove:
+      p: {x: 0, y: 0, z: 0}
+      dp: {x: 0, y: 0, z: 0}
+    playerInput:
+      throttle: {x: 0, y: 0, z: 0}
+      aim: {x: 0, y: 0, z: 0}
+      events: 
+    projectiles: []
+    debris: []
 --- !u!4 &243272047
 Transform:
   m_ObjectHideFlags: 0
@@ -259,7 +271,7 @@ GameObject:
   - component: {fileID: 519420030}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -455,6 +467,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2705821640878033132, guid: 323f8a00dfee74f4e9e95dbdafdf92d0,
+        type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 323f8a00dfee74f4e9e95dbdafdf92d0, type: 3}
