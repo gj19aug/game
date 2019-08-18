@@ -118,6 +118,7 @@ MonoBehaviour:
   collider: {fileID: 5800946821478537518}
   sprite: {fileID: 3092062353052357953}
   moveSpec: {fileID: 11400000, guid: 2dea4c77906e4004692ba859a0d2fcae, type: 2}
+  magnetismSpec: {fileID: 11400000, guid: b6ed92d16c3ecd142a61e6bc86e80f86, type: 2}
 --- !u!1 &3092062353052357952
 GameObject:
   m_ObjectHideFlags: 0

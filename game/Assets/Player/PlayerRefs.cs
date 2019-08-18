@@ -6,4 +6,5 @@ public class PlayerRefs : MonoBehaviour
     public new CircleCollider2D collider;
     public SpriteRenderer sprite;
     public MoveSpec moveSpec;
+    public MagnetismSpec magnetismSpec;
 }

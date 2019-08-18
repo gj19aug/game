@@ -7,8 +7,10 @@ public struct GameState
 {
     public MoveState playerMove;
     public ShipInput playerInput;
+
     public Pool<ProjectileRefs> projectilePool;
     public List<Projectile> projectiles;
+
     public List<Debris> debris;
 }
 

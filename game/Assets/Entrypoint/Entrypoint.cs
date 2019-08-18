@@ -9,7 +9,6 @@ public class Entrypoint : MonoBehaviour
     public PlayerRefs player;
     public new CameraRefs camera;
     public ProjectileRefs projectilePrefab;
-    public MagnetismSpec magnetism;
     public DebrisRefs debrisPrefab;
 
     // Cache
@@ -58,11 +57,13 @@ public class Entrypoint : MonoBehaviour
     {
         // NOTE: Simulate!
 
+        ref MoveState mv = ref state.playerMove;
+        ref ShipInput ip = ref state.playerInput;
+        ref MagnetismSpec mg = ref player.magnetismSpec;
+
         // Movement
         float dt = Time.fixedDeltaTime;
         MoveSpec ms = player.moveSpec;
-        ref MoveState mv = ref state.playerMove;
-        ref ShipInput ip = ref state.playerInput;
 
         float ddpMul = ms.acceleration;
         float dpDragMul = ms.velocityMultiplierForDrag;
@@ -116,9 +117,9 @@ public class Entrypoint : MonoBehaviour
         // Magnetism
         int count = Physics2D.OverlapCircleNonAlloc(
             state.playerMove.p,
-            magnetism.radius,
+            mg.radius,
             colliderCache,
-            magnetism.affectedLayers);
+            mg.affectedLayers);
 
         for (int i = 0; i < count; i++)
         {
@@ -127,7 +128,7 @@ public class Entrypoint : MonoBehaviour
 
             Vector3 scaledDir = state.playerMove.p - (Vector3) rb.position;
             float dist = scaledDir.magnitude;
-            float strength = magnetism.strength * magnetism.strengthCurve.Evaluate(dist);
+            float strength = mg.strength * mg.strengthCurve.Evaluate(dist);
             Vector3 force = scaledDir * (strength / dist);
             rb.AddForce(force, ForceMode2D.Force);
         }
@@ -136,18 +137,20 @@ public class Entrypoint : MonoBehaviour
     #if UNITY_EDITOR
     void OnDrawGizmos()
     {
+        ref MoveState mv = ref state.playerMove;
+        ref ShipInput ip = ref state.playerInput;
+        ref MagnetismSpec mg = ref player.magnetismSpec;
+
         if (EditorApplication.isPlaying)
         {
-            Vector3 from = state.playerMove.p;
-            Vector3 to = from + state.playerInput.aim;
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(from, to);
+            Gizmos.DrawLine(mv.p, mv.p + ip.aim);
         }
 
-        if (magnetism != null)
+        if (mg != null)
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(player.transform.position, magnetism.radius);
+            Gizmos.DrawWireSphere(player.rigidbody.position, mg.radius);
         }
     }
     #endif
