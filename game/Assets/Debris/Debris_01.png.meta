@@ -45,12 +45,12 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 155
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: 0.05
+  spriteTessellationDetail: 0.6
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -99,26 +99,43 @@ TextureImporter:
     sprites: []
     outline: []
     physicsShape:
-    - - {x: 62, y: -186}
-      - {x: 41, y: -178}
-      - {x: -5, y: -35}
-      - {x: -62, y: -40}
-      - {x: -152, y: 116}
-      - {x: -183, y: 132}
-      - {x: -191, y: 132}
-      - {x: -196, y: 130}
-      - {x: -204, y: 96}
-      - {x: -204, y: -208}
-      - {x: -128, y: -296}
-      - {x: -4, y: -366}
-      - {x: 19, y: -373}
-      - {x: 146, y: -431}
-      - {x: 206, y: -431}
-      - {x: 218, y: -424}
-      - {x: 218, y: -277}
-      - {x: 212, y: -229}
-      - {x: 174, y: -198}
-      - {x: 158, y: -244}
+    - - {x: 36.5, y: -19}
+      - {x: 30.5, y: -10}
+      - {x: 28.5, y: -10}
+      - {x: 25.5, y: -13}
+      - {x: 22.5, y: -14}
+      - {x: 14.5, y: -8}
+      - {x: 9.5, y: -6}
+      - {x: 3.5, y: -2}
+      - {x: 1.5, y: 6}
+      - {x: 0.5, y: 13}
+      - {x: -2.5, y: 16}
+      - {x: -5.5, y: 16}
+      - {x: -9.5, y: 14}
+      - {x: -15.5, y: 22}
+      - {x: -16.5, y: 27}
+      - {x: -18.5, y: 32}
+      - {x: -24.5, y: 37}
+      - {x: -24.5, y: 40}
+      - {x: -31.5, y: 47}
+      - {x: -34.5, y: 46}
+      - {x: -35.5, y: 40}
+      - {x: -35.5, y: 2}
+      - {x: -34.5, y: -8}
+      - {x: -32.5, y: -13}
+      - {x: -26.5, y: -18}
+      - {x: -25.5, y: -21}
+      - {x: -21.5, y: -26}
+      - {x: -13.5, y: -30}
+      - {x: -3.5, y: -37}
+      - {x: 6.5, y: -40}
+      - {x: 9.5, y: -40}
+      - {x: 18.5, y: -45}
+      - {x: 23.5, y: -47}
+      - {x: 33.5, y: -47}
+      - {x: 35.5, y: -44}
+      - {x: 35.5, y: -26}
+      - {x: 36.5, y: -26}
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
