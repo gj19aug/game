@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6519365182072298375}
   - component: {fileID: 8993612040472856364}
   m_Layer: 0
-  m_Name: Debris08
+  m_Name: Debris_08
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transform: {fileID: 6519365182072298375}
   rigidbody: {fileID: 9153571665536274358}
-  collider: {fileID: 3127731420720111680}
+  collider: {fileID: 492139170810978752}
 --- !u!1 &937288993553851338
 GameObject:
   m_ObjectHideFlags: 0
@@ -57,7 +57,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2968883591273071368}
   - component: {fileID: 9153571665536274358}
-  - component: {fileID: 3127731420720111680}
   m_Layer: 10
   m_Name: Physics
   m_TagString: Untagged
@@ -101,22 +100,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!70 &3127731420720111680
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 937288993553851338}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.03}
-  m_Size: {x: 1, y: 0.5}
-  m_Direction: 1
 --- !u!1 &8577622538392678373
 GameObject:
   m_ObjectHideFlags: 0
@@ -127,7 +110,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3688318844180695987}
   - component: {fileID: 4956046039508373095}
-  m_Layer: 0
+  - component: {fileID: 492139170810978752}
+  m_Layer: 10
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,3 +181,51 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!60 &492139170810978752
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8577622538392678373}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 10.79, y: 10.66}
+    newSize: {x: 8.7, y: 10.66}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 3.0049999, y: -1.17}
+      - {x: 3.705, y: -0.48}
+      - {x: 3.955, y: -0.47}
+      - {x: 3.955, y: 0.29999998}
+      - {x: 3.185, y: 0.64}
+      - {x: 2.445, y: 0.84}
+      - {x: 2.0449998, y: 1.9599999}
+      - {x: 1.655, y: 2.23}
+      - {x: 1.2049999, y: 2.23}
+      - {x: 1.025, y: 2.11}
+      - {x: -0.145, y: 0.91999996}
+      - {x: -2.135, y: -1.27}
+      - {x: -2.225, y: -1.48}
+      - {x: -2.225, y: -2.01}
+      - {x: -2.075, y: -2.44}
+      - {x: -0.865, y: -3.4199998}
+      - {x: -0.145, y: -3.98}
+      - {x: 0.145, y: -4.13}
+      - {x: 0.235, y: -4.13}
+      - {x: 1.2149999, y: -3.11}
+      - {x: 1.665, y: -2.28}
+      - {x: 1.780241, y: -2.2356768}
+      - {x: 2.055, y: -2.1299999}

@@ -53,6 +53,7 @@ public class Entrypoint : MonoBehaviour
     {
         // NOTE: Input only!
 
+        ref MoveState mv = ref state.playerMove;
         ref ShipInput ip = ref state.playerInput;
 
         // Move
@@ -65,7 +66,7 @@ public class Entrypoint : MonoBehaviour
         // Aim
         Assert.IsTrue(camera.camera.transform.forward == Vector3.forward);
         Vector3 mouseWS = camera.camera.ScreenToWorldPoint(Input.mousePosition); mouseWS.z = 0;
-        ip.aim = (mouseWS - state.playerMove.p).normalized;
+        ip.aim = (mouseWS - mv.p).normalized;
 
         // Shoot
         if (Input.GetKeyDown(KeyCode.Mouse0) | Input.GetKeyDown(KeyCode.Space))
@@ -80,11 +81,10 @@ public class Entrypoint : MonoBehaviour
         ref ShipInput ip = ref state.playerInput;
         ref MagnetismSpec mg = ref player.magnetismSpec;
         ref List<DebrisRefs> pd = ref state.playerDebris;
+        ref MoveSpec ms = ref player.moveSpec;
 
         // Movement
         float dt = Time.fixedDeltaTime;
-        MoveSpec ms = player.moveSpec;
-
         float ddpMul = ms.acceleration;
         float dpDragMul = ms.velocityMultiplierForDrag;
         float drag = ms.dragCurve.Evaluate(dpDragMul * mv.dp.magnitude) * ms.drag;
@@ -100,9 +100,9 @@ public class Entrypoint : MonoBehaviour
         camera.transform.position = Vector3.Lerp(camera.transform.position, mv.p, camera.spec.lerpFactor);
 
         // Shooting
-        for (int i = 0; i < state.playerInput.events.Count; i++)
+        for (int i = 0; i < ip.events.Count; i++)
         {
-            switch (state.playerInput.events[i])
+            switch (ip.events[i])
             {
                 default: Assert.IsTrue(false); break;
 
@@ -111,9 +111,9 @@ public class Entrypoint : MonoBehaviour
                     // DEBUG: Remove this once we shoot from turrets directly
                     // TODO: Horribly inefficient
                     float spawnRadius = player.collider.radius;
-                    for (int j = 0; j < state.playerDebris.Count; j++)
+                    for (int j = 0; j < pd.Count; j++)
                     {
-                        Bounds debrisBounds = state.playerDebris[j].collider.bounds;
+                        Bounds debrisBounds = pd[j].collider.bounds;
                         Vector3 relPos = debrisBounds.center - mv.p;
                         float dot = Vector3.Dot(relPos.normalized, ip.aim);
                         float dist = relPos.magnitude + debrisBounds.extents.magnitude;
@@ -132,7 +132,7 @@ public class Entrypoint : MonoBehaviour
                 }
             }
         }
-        state.playerInput.events.Clear();
+        ip.events.Clear();
 
         // TODO: Horribly inefficient
         // Projectiles
@@ -158,6 +158,8 @@ public class Entrypoint : MonoBehaviour
                 var refs = collider.GetComponentInParent<DebrisRefs>();
                 if (refs == null) continue;
 
+                Vector3 relPos = (Vector3) refs.rigidbody.position - mv.p;
+                refs.transform.position = refs.transform.position - (mg.packing * relPos.normalized);
                 refs.transform.parent = player.physicsTransform;
                 pd.Add(refs);
 
@@ -178,7 +180,7 @@ public class Entrypoint : MonoBehaviour
         // Apply force to nearby objects
         {
             int count = Physics2D.OverlapCircleNonAlloc(
-                state.playerMove.p,
+                mv.p,
                 mg.radius,
                 state.colliderCache,
                 mg.affectedLayers);
@@ -188,14 +190,14 @@ public class Entrypoint : MonoBehaviour
                 Rigidbody2D rb = state.colliderCache[i].attachedRigidbody;
                 if (rb.CompareTag(Tag.Player)) continue;
 
-                Vector3 scaledDir = state.playerMove.p - (Vector3) rb.position;
-                float dist = scaledDir.magnitude;
+                Vector3 relPos = (Vector3) rb.position - mv.p;
+                float dist = relPos.magnitude;
 
                 // NOTE: Object is inside the player. Skip it and let physics depenetrate it.
                 if (dist < player.collider.radius) continue;
 
                 float strength = mg.strength * mg.strengthCurve.Evaluate(dist / mg.radius);
-                Vector3 force = scaledDir * (strength / dist);
+                Vector3 force = -relPos * (strength / dist);
                 rb.AddForce(force, ForceMode2D.Force);
             }
         }

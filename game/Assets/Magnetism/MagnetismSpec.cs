@@ -15,6 +15,9 @@ public class MagnetismSpec : ScriptableObject
         new Keyframe(1, 0, 0, 0)
     );
 
+    [Range(-1, 1)]
+    public float packing = 0.1f;
+
     // NOTE: Can't provide a default because Unity is garbage
     public LayerMask affectedLayers;
 }
