@@ -36,7 +36,7 @@ public class Entrypoint : MonoBehaviour
         state.colliderCache = new Collider2D[32];
 
         // DEBUG: Spawn a bunch of debris
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 20; i++)
         {
             Pool<DebrisRefs> pool = RandomEx.Element(state.debrisPools);
             DebrisRefs pr = pool.Spawn();
@@ -98,6 +98,7 @@ public class Entrypoint : MonoBehaviour
 
         // Camera
         camera.transform.position = Vector3.Lerp(camera.transform.position, mv.p, camera.spec.lerpFactor);
+        camera.camera.orthographicSize = 5.0f + (player.physicsTransform.childCount * 0.1f);
 
         // Shooting
         for (int i = 0; i < ip.events.Count; i++)
