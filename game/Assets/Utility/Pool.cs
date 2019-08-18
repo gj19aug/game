@@ -21,9 +21,10 @@ public class Pool<T> where T : MonoBehaviour
         return instance;
     }
 
-    public void Initialize(string name, T prefab, int initialCount)
+    public void Initialize(T prefab, int initialCount)
     {
         // TODO: Assert prefab is actually a prefab
+        string name = string.Format("Pool ({0})", prefab.name);
         root = new GameObject(name).GetComponent<Transform>();
         pool = new List<T>(initialCount);
         active = new List<T>(initialCount);

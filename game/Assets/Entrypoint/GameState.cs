@@ -6,9 +6,7 @@ using UnityEngine;
 public struct GameState
 {
     // Player
-    public MoveState playerMove;
-    public ShipInput playerInput;
-    public List<DebrisRefs> playerDebris;
+    public PlayerShip player;
 
     // Projectiles
     public Pool<ProjectileRefs> projectilePool;
@@ -17,11 +15,36 @@ public struct GameState
     // Debris
     public Pool<DebrisRefs>[] debrisPools;
 
+    // Enemies
+    public Pool<ShipRefs>[] enemyPools;
+    public List<EnemyShip> enemies;
+
     // Cache
     public Collider2D[] colliderCache;
 
     // Debug
     public Vector3 lastProjectileSpawn;
+}
+
+[Serializable]
+public struct PlayerShip
+{
+    public ShipRefs refs;
+    public MoveState move;
+    public ShipInput input;
+    public List<DebrisRefs> debris;
+}
+
+[Serializable]
+public struct EnemyShip
+{
+    public ShipRefs refs;
+    public MoveState move;
+    public ShipInput input;
+    public AISpec aiSpec;
+
+    // TODO: This is probably bad
+    public ShipRefs target;
 }
 
 [Serializable]
