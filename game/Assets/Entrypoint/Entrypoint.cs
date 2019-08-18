@@ -108,12 +108,26 @@ public class Entrypoint : MonoBehaviour
 
                 case ShipInputEvent.Shoot:
                 {
+                    // DEBUG: Remove this once we shoot from turrets directly
+                    // TODO: Horribly inefficient
+                    float spawnRadius = player.collider.radius;
+                    for (int j = 0; j < state.playerDebris.Count; j++)
+                    {
+                        Bounds debrisBounds = state.playerDebris[j].collider.bounds;
+                        Vector3 relPos = debrisBounds.center - mv.p;
+                        float dot = Vector3.Dot(relPos.normalized, ip.aim);
+                        float dist = relPos.magnitude + debrisBounds.extents.magnitude;
+                        spawnRadius = Mathf.Max(spawnRadius, dot*dist);
+                    }
+
                     ProjectileRefs pr = state.projectilePool.Spawn();
                     pr.rigidbody.tag = Tag.Player;
-                    pr.rigidbody.position = mv.p + 0.5f*(player.collider.radius + pr.collider.radius)*ip.aim;
+                    pr.rigidbody.position = mv.p + (spawnRadius + pr.collider.radius) * ip.aim;
                     pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, ip.aim);
                     pr.rigidbody.AddForce(pr.spec.impulse * ip.aim, ForceMode2D.Impulse);
                     state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
+
+                    state.lastProjectileSpawn = pr.rigidbody.position;
                     break;
                 }
             }
@@ -198,6 +212,7 @@ public class Entrypoint : MonoBehaviour
         {
             Gizmos.color = Color.green;
             Gizmos.DrawLine(mv.p, mv.p + ip.aim);
+            Gizmos.DrawSphere(state.lastProjectileSpawn, 0.1f);
         }
 
         if (mg != null)

@@ -19,6 +19,9 @@ public struct GameState
 
     // Cache
     public Collider2D[] colliderCache;
+
+    // Debug
+    public Vector3 lastProjectileSpawn;
 }
 
 [Serializable]

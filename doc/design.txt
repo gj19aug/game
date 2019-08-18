@@ -20,10 +20,10 @@ Mechanics
 	[+] Movement
 	[+] Shooting
 	[+] Basic Camera
-	[ ] Magnetism
-	[ ] Basic Collision
+	[+] Magnetism
 	[ ] Enemy Waves
 	[ ] Enemy AI
+	[ ] Basic Collision
 	[ ] Health
 	[ ] Dynamic Ships
 	[ ] Design Tools
