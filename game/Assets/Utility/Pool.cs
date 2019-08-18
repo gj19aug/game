@@ -59,4 +59,9 @@ public class Pool<T> where T : MonoBehaviour
         Assert.IsTrue(removed);
         pool.Add(instance);
     }
+
+    public bool Remove(T instance)
+    {
+        return active.Remove(instance);
+    }
 }

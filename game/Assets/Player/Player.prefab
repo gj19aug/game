@@ -115,6 +115,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 4603457641461434570}
+  physicsTransform: {fileID: 490369626211553718}
   collider: {fileID: 5800946821478537518}
   sprite: {fileID: 3092062353052357953}
   moveSpec: {fileID: 11400000, guid: 2dea4c77906e4004692ba859a0d2fcae, type: 2}

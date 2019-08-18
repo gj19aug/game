@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 396e2be1df28b704aa084120f36016d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transform: {fileID: 1548272539215911732}
   rigidbody: {fileID: 6114217463211529905}
   collider: {fileID: 7567238076206246176}
 --- !u!1 &3934405321964963808

@@ -5,13 +5,20 @@ using UnityEngine;
 [Serializable]
 public struct GameState
 {
+    // Player
     public MoveState playerMove;
     public ShipInput playerInput;
+    public List<DebrisRefs> playerDebris;
 
+    // Projectiles
     public Pool<ProjectileRefs> projectilePool;
     public List<Projectile> projectiles;
 
-    public List<Debris> debris;
+    // Debris
+    public Pool<DebrisRefs>[] debrisPools;
+
+    // Cache
+    public Collider2D[] colliderCache;
 }
 
 [Serializable]
@@ -48,9 +55,4 @@ public static class Tag
     public static string Null = null;
     public static string Player = "Player";
     public static string Enemy = "Enemy";
-}
-
-[Serializable]
-public struct Debris
-{
 }

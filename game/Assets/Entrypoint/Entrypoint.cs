@@ -9,10 +9,7 @@ public class Entrypoint : MonoBehaviour
     public PlayerRefs player;
     public new CameraRefs camera;
     public ProjectileRefs projectilePrefab;
-    public DebrisRefs debrisPrefab;
-
-    // Cache
-    [HideInInspector] public Collider2D[] colliderCache;
+    public DebrisRefs[] debrisPrefabs;
 
     // Game State
     [HideInInspector] public GameState state;
@@ -28,29 +25,51 @@ public class Entrypoint : MonoBehaviour
         state.projectilePool = new Pool<ProjectileRefs>();
         state.projectilePool.Initialize("Projectiles", projectilePrefab, 64);
         state.projectiles = new List<Projectile>(64);
-        colliderCache = new Collider2D[32];
+        state.debrisPools = new Pool<DebrisRefs>[debrisPrefabs.Length];
+        for (int i = 0; i < debrisPrefabs.Length; i++)
+        {
+            var pool = new Pool<DebrisRefs>();
+            pool.Initialize("Debris", debrisPrefabs[i], 32);
+            state.debrisPools[i] = pool;
+        }
+
+        state.colliderCache = new Collider2D[32];
+
+        // DEBUG: Spawn a bunch of debris
+        for (int i = 0; i < 10; i++)
+        {
+            Pool<DebrisRefs> pool = RandomEx.Element(state.debrisPools);
+            DebrisRefs pr = pool.Spawn();
+            pr.rigidbody.position = 10.0f * Random.insideUnitCircle;
+            #if false
+            pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, ip.aim);
+            pr.rigidbody.AddForce(pr.spec.impulse * ip.aim, ForceMode2D.Impulse);
+            state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
+            #endif
+        }
     }
 
     void Update()
     {
         // NOTE: Input only!
 
+        ref ShipInput ip = ref state.playerInput;
+
         // Move
         Vector3 throttle = new Vector3();
         throttle.x = GetKeyValue(KeyCode.D) - GetKeyValue(KeyCode.A);
         throttle.y = GetKeyValue(KeyCode.W) - GetKeyValue(KeyCode.S);
         throttle = Vector3.ClampMagnitude(throttle, 1.0f);
-        state.playerInput.throttle = throttle;
+        ip.throttle = throttle;
 
         // Aim
         Assert.IsTrue(camera.camera.transform.forward == Vector3.forward);
-        Vector3 mouseSS = Input.mousePosition; mouseSS.z = -camera.camera.transform.position.z;
-        Vector3 mouseWS = camera.camera.ScreenToWorldPoint(mouseSS);
-        state.playerInput.aim = (mouseWS - state.playerMove.p).normalized;
+        Vector3 mouseWS = camera.camera.ScreenToWorldPoint(Input.mousePosition); mouseWS.z = 0;
+        ip.aim = (mouseWS - state.playerMove.p).normalized;
 
         // Shoot
         if (Input.GetKeyDown(KeyCode.Mouse0) | Input.GetKeyDown(KeyCode.Space))
-            state.playerInput.events.Add(ShipInputEvent.Shoot);
+            ip.events.Add(ShipInputEvent.Shoot);
     }
 
     void FixedUpdate()
@@ -60,6 +79,7 @@ public class Entrypoint : MonoBehaviour
         ref MoveState mv = ref state.playerMove;
         ref ShipInput ip = ref state.playerInput;
         ref MagnetismSpec mg = ref player.magnetismSpec;
+        ref List<DebrisRefs> pd = ref state.playerDebris;
 
         // Movement
         float dt = Time.fixedDeltaTime;
@@ -115,22 +135,55 @@ public class Entrypoint : MonoBehaviour
         }
 
         // Magnetism
-        int count = Physics2D.OverlapCircleNonAlloc(
-            state.playerMove.p,
-            mg.radius,
-            colliderCache,
-            mg.affectedLayers);
-
-        for (int i = 0; i < count; i++)
+        // Attach debris that's touching the player
         {
-            Rigidbody2D rb = colliderCache[i].attachedRigidbody;
-            if (rb.CompareTag(Tag.Player)) continue;
+            int count = player.rigidbody.GetContacts(state.colliderCache);
+            for (int i = 0; i < count; i++)
+            {
+                ref Collider2D collider = ref state.colliderCache[i];
+                var refs = collider.GetComponentInParent<DebrisRefs>();
+                if (refs == null) continue;
 
-            Vector3 scaledDir = state.playerMove.p - (Vector3) rb.position;
-            float dist = scaledDir.magnitude;
-            float strength = mg.strength * mg.strengthCurve.Evaluate(dist);
-            Vector3 force = scaledDir * (strength / dist);
-            rb.AddForce(force, ForceMode2D.Force);
+                refs.transform.parent = player.physicsTransform;
+                pd.Add(refs);
+
+                // TODO: Having to destroy instead of disable is pretty lame.
+                DestroyImmediate(refs.rigidbody);
+                refs.rigidbody = null;
+
+                // TODO: Horribly inefficient
+                for (int j = 0; j < state.debrisPools.Length; j++)
+                {
+                    if (state.debrisPools[j].Remove(refs))
+                        break;
+                }
+            }
+        }
+
+
+        // Apply force to nearby objects
+        {
+            int count = Physics2D.OverlapCircleNonAlloc(
+                state.playerMove.p,
+                mg.radius,
+                state.colliderCache,
+                mg.affectedLayers);
+
+            for (int i = 0; i < count; i++)
+            {
+                Rigidbody2D rb = state.colliderCache[i].attachedRigidbody;
+                if (rb.CompareTag(Tag.Player)) continue;
+
+                Vector3 scaledDir = state.playerMove.p - (Vector3) rb.position;
+                float dist = scaledDir.magnitude;
+
+                // NOTE: Object is inside the player. Skip it and let physics depenetrate it.
+                if (dist < player.collider.radius) continue;
+
+                float strength = mg.strength * mg.strengthCurve.Evaluate(dist / mg.radius);
+                Vector3 force = scaledDir * (strength / dist);
+                rb.AddForce(force, ForceMode2D.Force);
+            }
         }
     }
 
