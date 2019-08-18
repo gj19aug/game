@@ -154,6 +154,8 @@ MonoBehaviour:
   projectilePrefab: {fileID: 4004167460313986225, guid: 76552e3c3a9fa1d4e96406d8aa608e24,
     type: 3}
   magnetism: {fileID: 11400000, guid: b6ed92d16c3ecd142a61e6bc86e80f86, type: 2}
+  debrisPrefab: {fileID: 1889729939492513974, guid: 5af6e347abf5a8544ae06fc173c2c983,
+    type: 3}
   colliderCache: []
   state:
     playerMove:
