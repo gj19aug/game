@@ -73,13 +73,11 @@ public class Entrypoint : MonoBehaviour
         mv.p += 0.5f * ddp * dt * dt + mv.dp * dt;
         mv.dp += ddp * dt;
 
-        // TODO: Replace transform references
-        player.transform.position = mv.p;
+        player.rigidbody.position = mv.p;
 
         // Camera
         camera.transform.position = Vector3.Lerp(camera.transform.position, mv.p, camera.spec.lerpFactor);
 
-        // TODO: Try automatically leading shots
         // Shooting
         for (int i = 0; i < state.playerInput.events.Count; i++)
         {
@@ -89,13 +87,11 @@ public class Entrypoint : MonoBehaviour
 
                 case ShipInputEvent.Shoot:
                 {
-                    Vector3 aim = state.playerInput.aim;
-
                     ProjectileRefs pr = state.projectilePool.Spawn();
                     pr.rigidbody.tag = Tag.Player;
-                    // TODO: Ugly
-                    pr.rigidbody.position = state.playerMove.p + 0.5f*(player.collider.radius + pr.collider.radius)*aim;
-                    pr.rigidbody.AddForce(pr.spec.impulse * aim, ForceMode2D.Impulse);
+                    pr.rigidbody.position = mv.p + 0.5f*(player.collider.radius + pr.collider.radius)*ip.aim;
+                    pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, ip.aim);
+                    pr.rigidbody.AddForce(pr.spec.impulse * ip.aim, ForceMode2D.Impulse);
                     state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
                     break;
                 }
