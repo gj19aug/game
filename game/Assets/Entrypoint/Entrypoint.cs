@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
 public class Entrypoint : MonoBehaviour
 {
@@ -92,6 +93,9 @@ public class Entrypoint : MonoBehaviour
         // Shoot
         if (Input.GetKeyDown(KeyCode.Mouse0) | Input.GetKeyDown(KeyCode.Space))
             ip.events.Add(ShipInputEvent.Shoot);
+
+        if (Input.GetKeyDown("r"))
+            SceneManager.LoadScene("Level"); //Load scene called Game
     }
 
     static void ProcessShipMovement(ShipRefs refs, ref MoveState move, ref ShipInput input)
