@@ -4,10 +4,10 @@
 public class MagnetismSpec : ScriptableObject
 {
     // TODO: This is actually going to change over time. Can't just be a constant.
-    [Range(0, 5)]
+    [Range(0, 10)]
     public float radius = 5;
 
-    [Range(0, 500)]
+    [Range(0, 1000)]
     public float strength = 10;
 
     public AnimationCurve strengthCurve = new AnimationCurve(

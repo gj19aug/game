@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 595820f0adb41d747a1406755bf19fe4, type: 3}
   m_Name: Wide Magnetism Spec
   m_EditorClassIdentifier: 
-  radius: 5
-  strength: 10
+  radius: 8
+  strength: 30
   strengthCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 1
+      time: 0.050381042
+      value: 0.9997864
       inSlope: -2
       outSlope: -2
       tangentMode: 0
@@ -27,8 +27,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 0
+      time: 1.0005791
+      value: 0.013948321
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -38,6 +38,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  packing: 0.4
   affectedLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1536
