@@ -9,6 +9,30 @@ public static class RandomEx
     }
 }
 
+public static class TransformEx
+{
+    public static void MulScaleX(this Transform transform, float mul)
+    {
+        Vector3 scale = transform.localScale;
+        scale.x = mul * scale.x;
+        transform.localScale = scale;
+    }
+
+    public static void MulScaleY(this Transform transform, float mul)
+    {
+        Vector3 scale = transform.localScale;
+        scale.y = mul * scale.y;
+        transform.localScale = scale;
+    }
+
+    public static void MulScaleZ(this Transform transform, float mul)
+    {
+        Vector3 scale = transform.localScale;
+        scale.z = mul * scale.z;
+        transform.localScale = scale;
+    }
+}
+
 public static class Vector3Ex
 {
     public static Vector3 SetX(this Vector3 v, float x)

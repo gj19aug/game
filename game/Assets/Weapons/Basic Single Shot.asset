@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d865a9a6c325efd42b6adf29e0c4f889, type: 3}
   m_Name: Basic Single Shot
   m_EditorClassIdentifier: 
+  refireDelay: 0.1
   impulse: 25
   lifetime: 3

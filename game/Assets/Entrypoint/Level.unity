@@ -152,6 +152,8 @@ MonoBehaviour:
   camera: {fileID: 519420030}
   playerPrefab: {fileID: 3092062353021630551, guid: 323f8a00dfee74f4e9e95dbdafdf92d0,
     type: 3}
+  weaponPrefab: {fileID: 6795343969222469785, guid: 3999d4b6a3b126b40b9063f44b5c4a80,
+    type: 3}
   projectilePrefab: {fileID: 4004167460313986225, guid: 76552e3c3a9fa1d4e96406d8aa608e24,
     type: 3}
   debrisPrefabs:
@@ -176,6 +178,7 @@ MonoBehaviour:
         throttle: {x: 0, y: 0, z: 0}
         aim: {x: 0, y: 0, z: 0}
         events: 
+      weapons: []
       debris: []
     projectiles: []
     enemies: []

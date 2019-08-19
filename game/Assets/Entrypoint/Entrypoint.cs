@@ -9,6 +9,7 @@ public class Entrypoint : MonoBehaviour
     // Inspector
     public new CameraRefs camera;
     public ShipRefs playerPrefab;
+    public WeaponRefs weaponPrefab;
     public ProjectileRefs projectilePrefab;
     public DebrisRefs[] debrisPrefabs;
     public ShipRefs[] enemyPrefabs;
@@ -21,10 +22,25 @@ public class Entrypoint : MonoBehaviour
         return Input.GetKey(key) ? 1 : 0;
     }
 
+    void AddWeapon(ref ShipCommon ship, Vector3 relPos)
+    {
+        Transform parent = ship.refs.physicsTransform;
+
+        var weapon = new Weapon();
+        weapon.refs = state.weaponPool.Spawn();
+        weapon.refs.transform.parent = parent;
+        weapon.refs.transform.localPosition = relPos;
+        // NOTE: Assume x is down
+        float angle = Vector2.SignedAngle(relPos, Vector2.down);
+        Assert.IsTrue(angle >= -180 && angle <= 180);
+        if (angle < 0) weapon.refs.transform.MulScaleX(-1.0f);
+        ship.weapons.Add(weapon);
+    }
+
     void Awake()
     {
-        state.player.refs = Instantiate(playerPrefab);
-        state.player.input.events = new List<ShipInputEvent>(8);
+        state.weaponPool = new Pool<WeaponRefs>();
+        state.weaponPool.Initialize(weaponPrefab, 32);
         state.projectilePool = new Pool<ProjectileRefs>();
         state.projectilePool.Initialize(projectilePrefab, 64);
         state.projectiles = new List<Projectile>(64);
@@ -49,6 +65,15 @@ public class Entrypoint : MonoBehaviour
 
         state.colliderCache = new Collider2D[32];
 
+        // Spawn player
+        {
+            state.player.common.refs = Instantiate(playerPrefab);
+            state.player.common.weapons = new List<Weapon>(2);
+            state.player.common.input.events = new List<ShipInputEvent>(8);
+            AddWeapon(ref state.player.common, new Vector3(-0.25f, 0.0f, 0.0f));
+            AddWeapon(ref state.player.common, new Vector3(+0.25f, 0.0f, 0.0f));
+        }
+
         // DEBUG: Spawn a bunch of debris
         for (int i = 0; i < 20; i++)
         {
@@ -56,17 +81,24 @@ public class Entrypoint : MonoBehaviour
             DebrisRefs debris = pool.Spawn();
             debris.rigidbody.position = 10.0f * Random.insideUnitCircle;
             debris.rigidbody.rotation = 360.0f * Random.value;
+            debris.rigidbody.AddForce(Random.insideUnitCircle, ForceMode2D.Impulse);
         }
 
         // TODO: Figure out player-enemy collisions!
         // DEBUG: Spawn an enemy
+        if (false)
         {
             Pool<ShipRefs> pool = RandomEx.Element(state.enemyPools);
             var es = new EnemyShip();
-            es.refs = pool.Spawn();
-            es.move.p = new Vector2(5, 0);
-            es.input.events = new List<ShipInputEvent>(8);
-            es.target = state.player.refs;
+            es.common.refs = pool.Spawn();
+            es.common.weapons = new List<Weapon>(2);
+            es.common.input.events = new List<ShipInputEvent>(8);
+
+            es.common.move.p = new Vector2(5, 0);
+            AddWeapon(ref es.common, new Vector3(-1.0f, 0.0f, 0.0f));
+            AddWeapon(ref es.common, new Vector3(+1.0f, 0.0f, 0.0f));
+            es.target = state.player.common.refs;
+
             state.enemies.Add(es);
         }
     }
@@ -75,8 +107,8 @@ public class Entrypoint : MonoBehaviour
     {
         // NOTE: Input only!
 
-        ref MoveState mv = ref state.player.move;
-        ref ShipInput ip = ref state.player.input;
+        ref MoveState mv = ref state.player.common.move;
+        ref ShipInput ip = ref state.player.common.input;
 
         // Move
         Vector3 throttle = new Vector3();
@@ -91,16 +123,19 @@ public class Entrypoint : MonoBehaviour
         ip.aim = (mouseWS - mv.p).normalized;
 
         // Shoot
-        if (Input.GetKeyDown(KeyCode.Mouse0) | Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Mouse0) | Input.GetKey(KeyCode.Space))
             ip.events.Add(ShipInputEvent.Shoot);
 
         if (Input.GetKeyDown("r"))
             SceneManager.LoadScene("Level"); //Load scene called Game
     }
 
-    static void ProcessShipMovement(ShipRefs refs, ref MoveState move, ref ShipInput input)
+    static void ProcessShipMovement(ref ShipCommon ship)
     {
-        ref MoveSpec spec = ref refs.moveSpec;
+        ref MoveSpec spec = ref ship.refs.moveSpec;
+        ref MoveState move = ref ship.move;
+        ref ShipInput input = ref ship.input;
+        Rigidbody2D rigidbody = ship.refs.rigidbody;
 
         float dt = Time.fixedDeltaTime;
         float ddpMul = spec.acceleration;
@@ -114,11 +149,19 @@ public class Entrypoint : MonoBehaviour
 
         // TODO: This tanks performance. Why? (related: full kinematic events on player & enemies)
         //refs.rigidbody.MovePosition(move.p);
-        refs.rigidbody.position = move.p;
+
+        rigidbody.position = move.p;
+        rigidbody.rotation = Mathf.LerpAngle(
+            rigidbody.rotation,
+            Vector2.SignedAngle(Vector2.up, input.throttle),
+            0.1f);
     }
 
-    void ProcessShipEvents(ShipRefs refs, ref MoveState move, ref ShipInput input, List<DebrisRefs> debris)
+    void ProcessShipEvents(ref ShipCommon ship, List<DebrisRefs> debris)
     {
+        float t = Time.fixedTime;
+        ref ShipInput input = ref ship.input;
+
         for (int i = 0; i < input.events.Count; i++)
         {
             switch (input.events[i])
@@ -127,29 +170,24 @@ public class Entrypoint : MonoBehaviour
 
                 case ShipInputEvent.Shoot:
                 {
-                    // DEBUG: Remove this once we shoot from turrets directly
-                    // TODO: Horribly inefficient
-                    float spawnRadius = refs.collider.Radius();
-                    if (debrisPrefabs != null)
+                    for (int j = 0; j < ship.weapons.Count; j++)
                     {
-                        for (int j = 0; j < debris.Count; j++)
-                        {
-                            Bounds debrisBounds = debris[j].collider.bounds;
-                            Vector3 relPos = debrisBounds.center - move.p;
-                            float dot = Vector3.Dot(relPos.normalized, input.aim);
-                            float dist = relPos.magnitude + debrisBounds.extents.magnitude;
-                            spawnRadius = Mathf.Max(spawnRadius, dot*dist);
-                        }
+                        Weapon weapon = ship.weapons[j];
+                        WeaponRefs refs = weapon.refs;
+
+                        if (t < weapon.nextRefireTime) continue;
+                        weapon.nextRefireTime = t + refs.spec.refireDelay;
+
+                        ProjectileRefs pr = state.projectilePool.Spawn();
+                        pr.rigidbody.tag = Tag.Player;
+                        pr.rigidbody.position = refs.fireTransform.position;
+                        // TODO: Ensure this rotation is correct
+                        pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
+                        pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
+                        state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
+
+                        ship.weapons[j] = weapon;
                     }
-
-                    ProjectileRefs pr = state.projectilePool.Spawn();
-                    pr.rigidbody.tag = Tag.Player;
-                    pr.rigidbody.position = move.p + (spawnRadius + pr.collider.radius) * input.aim;
-                    pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
-                    pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
-                    state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
-
-                    state.lastProjectileSpawn = (Vector3) pr.rigidbody.position - move.p;
                     break;
                 }
             }
@@ -164,21 +202,29 @@ public class Entrypoint : MonoBehaviour
         float dt = Time.fixedDeltaTime;
         ref PlayerShip player = ref state.player;
 
-        ProcessShipMovement(player.refs, ref player.move, ref player.input);
-        ProcessShipEvents(player.refs, ref player.move, ref player.input, player.debris);
+        ProcessShipMovement(ref player.common);
+        ProcessShipEvents(ref player.common, player.debris);
 
         for (int i = 0; i < state.enemies.Count; i++)
         {
             EnemyShip enemy = state.enemies[i];
-            ProcessShipMovement(enemy.refs, ref enemy.move, ref enemy.input);
-            ProcessShipEvents(enemy.refs, ref enemy.move, ref enemy.input, null);
+
+            // (Shitty) AI
+            Vector3 relPos = enemy.common.move.p - (Vector3) enemy.target.rigidbody.position;
+            Vector3 targetPos = 3.0f * relPos.normalized;
+            Vector3 deltaPos = targetPos - relPos;
+            enemy.common.input.throttle = Vector3.ClampMagnitude(deltaPos, 1.0f);
+            enemy.common.input.events.Add(ShipInputEvent.Shoot);
+
+            ProcessShipMovement(ref enemy.common);
+            ProcessShipEvents(ref enemy.common, null);
             state.enemies[i] = enemy;
         }
 
         // Camera
         // TODO: Should the camera have a rigidbody for movement interpolation?
-        camera.transform.position = Vector3.Lerp(camera.transform.position, player.move.p, camera.spec.lerpFactor);
-        camera.camera.orthographicSize = 5.0f + (player.refs.physicsTransform.childCount * 0.1f);
+        camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
+        camera.camera.orthographicSize = 5.0f + (player.common.refs.physicsTransform.childCount * 0.1f);
 
         // TODO: Horribly inefficient
         // Projectiles
@@ -195,19 +241,22 @@ public class Entrypoint : MonoBehaviour
         }
 
         // Magnetism
-        // Attach debris that's touching the player
-        MagnetismSpec mag = player.refs.magnetismSpec;
         {
-            int count = player.refs.rigidbody.GetContacts(state.colliderCache);
-            for (int i = 0; i < count; i++)
+            ref MoveState move = ref state.player.common.move;
+            ShipRefs refs = player.common.refs;
+            MagnetismSpec mag = player.common.refs.magnetismSpec;
+
+            // Attach debris that's touching the player
+            int attachCount = refs.rigidbody.GetContacts(state.colliderCache);
+            for (int i = 0; i < attachCount; i++)
             {
                 ref Collider2D collider = ref state.colliderCache[i];
                 var dr = collider.GetComponentInParent<DebrisRefs>();
                 if (dr == null) continue;
 
-                Vector3 relPos = (Vector3) dr.rigidbody.position - player.move.p;
+                Vector3 relPos = (Vector3) dr.rigidbody.position - move.p;
                 dr.transform.position = dr.transform.position - (mag.packing * relPos.normalized);
-                dr.transform.parent = player.refs.physicsTransform;
+                dr.transform.parent = refs.physicsTransform;
                 player.debris.Add(dr);
 
                 // TODO: Having to destroy instead of disable is pretty lame.
@@ -221,26 +270,24 @@ public class Entrypoint : MonoBehaviour
                         break;
                 }
             }
-        }
 
-        // Apply force to nearby objects
-        {
-            int count = Physics2D.OverlapCircleNonAlloc(
-                player.move.p,
+            // Apply force to nearby objects
+            int nearCount = Physics2D.OverlapCircleNonAlloc(
+                move.p,
                 mag.radius,
                 state.colliderCache,
                 mag.affectedLayers);
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < nearCount; i++)
             {
                 Rigidbody2D rb = state.colliderCache[i].attachedRigidbody;
                 if (rb.CompareTag(Tag.Player)) continue;
 
-                Vector3 relPos = (Vector3) rb.position - player.move.p;
+                Vector3 relPos = (Vector3) rb.position - move.p;
                 float dist = relPos.magnitude;
 
                 // NOTE: Object is inside the player. Skip it and let physics depenetrate it.
-                if (dist < player.refs.collider.Radius()) continue;
+                if (dist < refs.collider.Radius()) continue;
 
                 float strength = mag.strength * mag.strengthCurve.Evaluate(dist / mag.radius);
                 Vector3 force = -relPos * (strength / dist);
@@ -252,24 +299,28 @@ public class Entrypoint : MonoBehaviour
     #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        if (state.player.refs == null) return;
+        if (state.player.common.refs == null) return;
 
-        ref ShipRefs pRefs = ref state.player.refs;
-        ref MoveState mv = ref state.player.move;
-        ref ShipInput ip = ref state.player.input;
-        ref MagnetismSpec mg = ref state.player.refs.magnetismSpec;
+        ref ShipCommon ship = ref state.player.common;
+        ref ShipRefs refs = ref state.player.common.refs;
+        ref ShipInput input = ref state.player.common.input;
+        ref MagnetismSpec mag = ref state.player.common.refs.magnetismSpec;
 
         if (EditorApplication.isPlaying)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawLine(mv.p, mv.p + ip.aim);
-            Gizmos.DrawSphere(mv.p + state.lastProjectileSpawn, 0.1f);
+            for (int i = 0; i < ship.weapons.Count; i++)
+            {
+                Weapon weapon = ship.weapons[i];
+                Vector3 pos = weapon.refs.fireTransform.position;
+                Gizmos.DrawLine(pos, pos + input.aim);
+            }
         }
 
-        if (mg != null)
+        if (mag != null)
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireSphere(pRefs.rigidbody.position, mg.radius);
+            Gizmos.DrawWireSphere(refs.rigidbody.position, mag.radius);
         }
     }
     #endif

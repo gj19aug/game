@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 
+// TODO: Rename to weapon spec
 [CreateAssetMenu(fileName = "New Projectile Spec", menuName = "Projectile Spec")]
 public class ProjectileSpec : ScriptableObject
 {
+    [Range(0.0f, 10.0f)]
+    public float refireDelay = 0.1f;
+
     [Range(0.1f, 50.0f)]
     public float impulse = 20.0f;
 

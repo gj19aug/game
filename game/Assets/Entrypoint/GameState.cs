@@ -8,7 +8,8 @@ public struct GameState
     // Player
     public PlayerShip player;
 
-    // Projectiles
+    // Weapons
+    public Pool<WeaponRefs> weaponPool;
     public Pool<ProjectileRefs> projectilePool;
     public List<Projectile> projectiles;
 
@@ -21,26 +22,28 @@ public struct GameState
 
     // Cache
     public Collider2D[] colliderCache;
+}
 
-    // Debug
-    public Vector3 lastProjectileSpawn;
+[Serializable]
+public struct ShipCommon
+{
+    public ShipRefs refs;
+    public MoveState move;
+    public ShipInput input;
+    public List<Weapon> weapons;
 }
 
 [Serializable]
 public struct PlayerShip
 {
-    public ShipRefs refs;
-    public MoveState move;
-    public ShipInput input;
+    public ShipCommon common;
     public List<DebrisRefs> debris;
 }
 
 [Serializable]
 public struct EnemyShip
 {
-    public ShipRefs refs;
-    public MoveState move;
-    public ShipInput input;
+    public ShipCommon common;
     public AISpec aiSpec;
 
     // TODO: This is probably bad
@@ -67,6 +70,13 @@ public struct ShipInput
     public Vector3 throttle;
     public Vector3 aim;
     public List<ShipInputEvent> events;
+}
+
+[Serializable]
+public struct Weapon
+{
+    public WeaponRefs refs;
+    public float nextRefireTime;
 }
 
 [Serializable]
