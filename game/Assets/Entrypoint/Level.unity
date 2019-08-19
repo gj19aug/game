@@ -165,6 +165,7 @@ MonoBehaviour:
   - {fileID: 8993612040472856364, guid: 465b6c3f6c0b9e041917f4979078f72a, type: 3}
   enemyPrefabs:
   - {fileID: -2299728369730618024, guid: 168d83b77a0742d468562c467aec61a4, type: 3}
+  - {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1, type: 3}
   state:
     player:
       refs: {fileID: 0}
