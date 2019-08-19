@@ -108,7 +108,9 @@ public class Entrypoint : MonoBehaviour
         move.p += 0.5f * ddp * dt * dt + move.dp * dt;
         move.dp += ddp * dt;
 
-        refs.rigidbody.MovePosition(move.p);
+        // TODO: This tanks performance. Why? (related: full kinematic events on player & enemies)
+        //refs.rigidbody.MovePosition(move.p);
+        refs.rigidbody.position = move.p;
     }
 
     void ProcessShipEvents(ShipRefs refs, ref MoveState move, ref ShipInput input, List<DebrisRefs> debris)
