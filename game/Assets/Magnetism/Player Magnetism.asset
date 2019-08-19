@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 595820f0adb41d747a1406755bf19fe4, type: 3}
   m_Name: Player Magnetism
   m_EditorClassIdentifier: 
-  radius: 5
-  strength: 500
+  radius: 10
+  strength: 100
   strengthCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.49855042
-      value: 0.9920807
+      time: -0.5
+      value: 0.9
       inSlope: -2
       outSlope: -2
       tangentMode: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  packing: 0.4
+  packing: 0.2
   affectedLayers:
     serializedVersion: 2
     m_Bits: 1536
