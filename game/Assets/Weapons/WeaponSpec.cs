@@ -11,4 +11,8 @@ public class WeaponSpec : ScriptableObject
 
     [Range(0.1f, 10.0f)]
     public float lifetime = 3.0f;
+
+    [Tooltip("How fast the weapon is capable of turning. Units are incomprehensible.")]
+    [Range(0, 1)]
+    public float turnSpeed = 0.1f;
 }

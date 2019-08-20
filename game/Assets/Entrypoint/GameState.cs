@@ -62,6 +62,7 @@ public struct MoveState
 public struct ShipInput
 {
     public Vector3 throttle;
+    public Vector3 point;
     public Vector3 aim;
     public bool shoot;
 }
@@ -71,6 +72,7 @@ public struct Weapon
 {
     public WeaponRefs refs;
     public WeaponSpec spec;
+    public Vector3 aim;
     public float nextRefireTime;
 }
 
