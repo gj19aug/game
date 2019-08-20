@@ -24,6 +24,7 @@ public class Pool<T> where T : MonoBehaviour
     public void Initialize(T prefab, int initialCount)
     {
         // TODO: Assert prefab is actually a prefab
+        this.prefab = prefab;
         string name = string.Format("Pool ({0})", prefab.name);
         root = new GameObject(name).GetComponent<Transform>();
         pool = new List<T>(initialCount);

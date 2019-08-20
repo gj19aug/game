@@ -10,6 +10,8 @@ public class Entrypoint : MonoBehaviour
     public new CameraRefs camera;
     public ShipRefs playerPrefab;
     public WeaponRefs weaponPrefab;
+    public WeaponSpec playerWeaponSpec;
+    public WeaponSpec enemyWeaponSpec;
     public ProjectileRefs projectilePrefab;
     public DebrisRefs[] debrisPrefabs;
     public ShipRefs[] enemyPrefabs;
@@ -22,7 +24,7 @@ public class Entrypoint : MonoBehaviour
         return Input.GetKey(key) ? 1 : 0;
     }
 
-    void AddWeapon(ref ShipCommon ship, Vector3 relPos)
+    void AddWeapon(ref ShipCommon ship, WeaponSpec spec, Vector3 relPos)
     {
         Transform parent = ship.refs.physicsTransform;
 
@@ -30,6 +32,7 @@ public class Entrypoint : MonoBehaviour
         weapon.refs = state.weaponPool.Spawn();
         weapon.refs.transform.parent = parent;
         weapon.refs.transform.localPosition = relPos;
+        weapon.spec = spec;
         // NOTE: Assume x is down
         float angle = Vector2.SignedAngle(relPos, Vector2.down);
         Assert.IsTrue(angle >= -180 && angle <= 180);
@@ -75,17 +78,18 @@ public class Entrypoint : MonoBehaviour
             if (input.shoot)
             {
                 WeaponRefs refs = weapon.refs;
+                WeaponSpec spec = weapon.spec;
 
                 if (t < weapon.nextRefireTime) continue;
-                weapon.nextRefireTime = t + refs.spec.refireDelay;
+                weapon.nextRefireTime = t + spec.refireDelay;
 
                 ProjectileRefs pr = state.projectilePool.Spawn();
                 pr.rigidbody.tag = Tag.Player;
                 pr.rigidbody.position = refs.fireTransform.position;
                 // TODO: Ensure this rotation is correct
                 pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
-                pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
-                state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
+                pr.rigidbody.AddForce(spec.impulse * input.aim, ForceMode2D.Impulse);
+                state.projectiles.Add(new Projectile() { refs = pr, lifetime = spec.lifetime });
             }
 
             ship.weapons[j] = weapon;
@@ -98,8 +102,8 @@ public class Entrypoint : MonoBehaviour
         state.weaponPool = new Pool<WeaponRefs>();
         state.weaponPool.Initialize(weaponPrefab, 32);
         state.projectilePool = new Pool<ProjectileRefs>();
-        state.projectilePool.Initialize(projectilePrefab, 64);
-        state.projectiles = new List<Projectile>(64);
+        state.projectilePool.Initialize(projectilePrefab, 128);
+        state.projectiles = new List<Projectile>(128);
 
         state.debrisPools = new Pool<DebrisRefs>[debrisPrefabs.Length];
         for (int i = 0; i < debrisPrefabs.Length; i++)
@@ -125,8 +129,8 @@ public class Entrypoint : MonoBehaviour
         {
             state.player.common.refs = Instantiate(playerPrefab);
             state.player.common.weapons = new List<Weapon>(2);
-            AddWeapon(ref state.player.common, new Vector3(-0.25f, 0.0f, 0.0f));
-            AddWeapon(ref state.player.common, new Vector3(+0.25f, 0.0f, 0.0f));
+            AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
+            AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
         }
 
         // DEBUG: Spawn a bunch of debris
@@ -141,7 +145,6 @@ public class Entrypoint : MonoBehaviour
 
         // TODO: Figure out player-enemy collisions!
         // DEBUG: Spawn an enemy
-        if (false)
         {
             Pool<ShipRefs> pool = RandomEx.Element(state.enemyPools);
             var es = new EnemyShip();
@@ -149,8 +152,8 @@ public class Entrypoint : MonoBehaviour
             es.common.weapons = new List<Weapon>(2);
 
             es.common.move.p = new Vector2(5, 0);
-            AddWeapon(ref es.common, new Vector3(-1.0f, 0.0f, 0.0f));
-            AddWeapon(ref es.common, new Vector3(+1.0f, 0.0f, 0.0f));
+            AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
+            AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(+1.0f, 0.0f, 0.0f));
             es.target = state.player.common.refs;
 
             state.enemies.Add(es);

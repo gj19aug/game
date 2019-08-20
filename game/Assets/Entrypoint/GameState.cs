@@ -70,6 +70,7 @@ public struct ShipInput
 public struct Weapon
 {
     public WeaponRefs refs;
+    public WeaponSpec spec;
     public float nextRefireTime;
 }
 
