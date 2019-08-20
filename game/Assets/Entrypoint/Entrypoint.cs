@@ -37,6 +37,62 @@ public class Entrypoint : MonoBehaviour
         ship.weapons.Add(weapon);
     }
 
+    static void ProcessShipMovement(ref ShipCommon ship)
+    {
+        ref MoveSpec spec = ref ship.refs.moveSpec;
+        ref MoveState move = ref ship.move;
+        ref ShipInput input = ref ship.input;
+        Rigidbody2D rigidbody = ship.refs.rigidbody;
+
+        float dt = Time.fixedDeltaTime;
+        float ddpMul = spec.acceleration;
+        float dpDragMul = spec.velocityMultiplierForDrag;
+        float drag = spec.dragCurve.Evaluate(dpDragMul * move.dp.magnitude) * spec.drag;
+
+        Vector3 ddp = ddpMul * input.throttle;
+        ddp += drag * -move.dp;
+        move.p += 0.5f * ddp * dt * dt + move.dp * dt;
+        move.dp += ddp * dt;
+
+        move.look = Vector3.Slerp(move.look, input.aim, spec.turnSpeed);
+
+        // TODO: This tanks performance. Why? (related: full kinematic events on player & enemies)
+        //refs.rigidbody.MovePosition(move.p);
+
+        rigidbody.position = move.p;
+        rigidbody.rotation = Vector2.SignedAngle(Vector2.up, move.look);
+    }
+
+    void ProcessShipEvents(ref ShipCommon ship, List<DebrisRefs> debris)
+    {
+        float t = Time.fixedTime;
+        ref ShipInput input = ref ship.input;
+
+        for (int j = 0; j < ship.weapons.Count; j++)
+        {
+            Weapon weapon = ship.weapons[j];
+
+            if (input.shoot)
+            {
+                WeaponRefs refs = weapon.refs;
+
+                if (t < weapon.nextRefireTime) continue;
+                weapon.nextRefireTime = t + refs.spec.refireDelay;
+
+                ProjectileRefs pr = state.projectilePool.Spawn();
+                pr.rigidbody.tag = Tag.Player;
+                pr.rigidbody.position = refs.fireTransform.position;
+                // TODO: Ensure this rotation is correct
+                pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
+                pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
+                state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
+            }
+
+            ship.weapons[j] = weapon;
+        }
+        input = new ShipInput();
+    }
+
     void Awake()
     {
         state.weaponPool = new Pool<WeaponRefs>();
@@ -123,64 +179,9 @@ public class Entrypoint : MonoBehaviour
         // Shoot
         ip.shoot = Input.GetKey(KeyCode.Mouse0) | Input.GetKey(KeyCode.Space);
 
-        if (Input.GetKeyDown("r"))
-            SceneManager.LoadScene("Level"); //Load scene called Game
-    }
-
-    static void ProcessShipMovement(ref ShipCommon ship)
-    {
-        ref MoveSpec spec = ref ship.refs.moveSpec;
-        ref MoveState move = ref ship.move;
-        ref ShipInput input = ref ship.input;
-        Rigidbody2D rigidbody = ship.refs.rigidbody;
-
-        float dt = Time.fixedDeltaTime;
-        float ddpMul = spec.acceleration;
-        float dpDragMul = spec.velocityMultiplierForDrag;
-        float drag = spec.dragCurve.Evaluate(dpDragMul * move.dp.magnitude) * spec.drag;
-
-        Vector3 ddp = ddpMul * input.throttle;
-        ddp += drag * -move.dp;
-        move.p += 0.5f * ddp * dt * dt + move.dp * dt;
-        move.dp += ddp * dt;
-
-        move.look = Vector3.Slerp(move.look, input.aim, spec.turnSpeed);
-
-        // TODO: This tanks performance. Why? (related: full kinematic events on player & enemies)
-        //refs.rigidbody.MovePosition(move.p);
-
-        rigidbody.position = move.p;
-        rigidbody.rotation = Vector2.SignedAngle(Vector2.up, move.look);
-    }
-
-    void ProcessShipEvents(ref ShipCommon ship, List<DebrisRefs> debris)
-    {
-        float t = Time.fixedTime;
-        ref ShipInput input = ref ship.input;
-
-        for (int j = 0; j < ship.weapons.Count; j++)
-        {
-            Weapon weapon = ship.weapons[j];
-
-            if (input.shoot)
-            {
-                WeaponRefs refs = weapon.refs;
-
-                if (t < weapon.nextRefireTime) continue;
-                weapon.nextRefireTime = t + refs.spec.refireDelay;
-
-                ProjectileRefs pr = state.projectilePool.Spawn();
-                pr.rigidbody.tag = Tag.Player;
-                pr.rigidbody.position = refs.fireTransform.position;
-                // TODO: Ensure this rotation is correct
-                pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
-                pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
-                state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
-            }
-
-            ship.weapons[j] = weapon;
-        }
-        input = new ShipInput();
+        // HACK: Reset
+        if (Input.GetKeyDown(KeyCode.R))
+            SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
     void FixedUpdate()
