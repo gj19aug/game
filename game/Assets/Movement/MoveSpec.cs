@@ -19,4 +19,8 @@ public class MoveSpec : ScriptableObject
     [Tooltip("Multiplier for the characters current speed before feeding it into the drag curve above. This is a cheap hack that can be used to ensure the drag curve is active across the entire velocity range.")]
     [Range(0, 1)]
     public float velocityMultiplierForDrag = 0.2f;
+
+    [Tooltip("How fast the ship is capable of turning. Units are incomprehensible.")]
+    [Range(0, 1)]
+    public float turnSpeed = 0.1f;
 }

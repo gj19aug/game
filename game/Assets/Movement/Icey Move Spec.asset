@@ -39,3 +39,4 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   velocityMultiplierForDrag: 0.03
+  turnSpeed: 0.1

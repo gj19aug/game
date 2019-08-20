@@ -55,13 +55,7 @@ public struct MoveState
 {
     public Vector3 p;
     public Vector3 dp;
-}
-
-[Serializable]
-public enum ShipInputEvent
-{
-    Null,
-    Shoot,
+    public Vector3 look;
 }
 
 [Serializable]
@@ -69,7 +63,7 @@ public struct ShipInput
 {
     public Vector3 throttle;
     public Vector3 aim;
-    public List<ShipInputEvent> events;
+    public bool shoot;
 }
 
 [Serializable]

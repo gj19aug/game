@@ -69,7 +69,6 @@ public class Entrypoint : MonoBehaviour
         {
             state.player.common.refs = Instantiate(playerPrefab);
             state.player.common.weapons = new List<Weapon>(2);
-            state.player.common.input.events = new List<ShipInputEvent>(8);
             AddWeapon(ref state.player.common, new Vector3(-0.25f, 0.0f, 0.0f));
             AddWeapon(ref state.player.common, new Vector3(+0.25f, 0.0f, 0.0f));
         }
@@ -92,7 +91,6 @@ public class Entrypoint : MonoBehaviour
             var es = new EnemyShip();
             es.common.refs = pool.Spawn();
             es.common.weapons = new List<Weapon>(2);
-            es.common.input.events = new List<ShipInputEvent>(8);
 
             es.common.move.p = new Vector2(5, 0);
             AddWeapon(ref es.common, new Vector3(-1.0f, 0.0f, 0.0f));
@@ -123,8 +121,7 @@ public class Entrypoint : MonoBehaviour
         ip.aim = (mouseWS - mv.p).normalized;
 
         // Shoot
-        if (Input.GetKey(KeyCode.Mouse0) | Input.GetKey(KeyCode.Space))
-            ip.events.Add(ShipInputEvent.Shoot);
+        ip.shoot = Input.GetKey(KeyCode.Mouse0) | Input.GetKey(KeyCode.Space);
 
         if (Input.GetKeyDown("r"))
             SceneManager.LoadScene("Level"); //Load scene called Game
@@ -147,14 +144,13 @@ public class Entrypoint : MonoBehaviour
         move.p += 0.5f * ddp * dt * dt + move.dp * dt;
         move.dp += ddp * dt;
 
+        move.look = Vector3.Slerp(move.look, input.aim, spec.turnSpeed);
+
         // TODO: This tanks performance. Why? (related: full kinematic events on player & enemies)
         //refs.rigidbody.MovePosition(move.p);
 
         rigidbody.position = move.p;
-        rigidbody.rotation = Mathf.LerpAngle(
-            rigidbody.rotation,
-            Vector2.SignedAngle(Vector2.up, input.throttle),
-            0.1f);
+        rigidbody.rotation = Vector2.SignedAngle(Vector2.up, move.look);
     }
 
     void ProcessShipEvents(ref ShipCommon ship, List<DebrisRefs> debris)
@@ -162,37 +158,29 @@ public class Entrypoint : MonoBehaviour
         float t = Time.fixedTime;
         ref ShipInput input = ref ship.input;
 
-        for (int i = 0; i < input.events.Count; i++)
+        for (int j = 0; j < ship.weapons.Count; j++)
         {
-            switch (input.events[i])
+            Weapon weapon = ship.weapons[j];
+
+            if (input.shoot)
             {
-                default: Assert.IsTrue(false); break;
+                WeaponRefs refs = weapon.refs;
 
-                case ShipInputEvent.Shoot:
-                {
-                    for (int j = 0; j < ship.weapons.Count; j++)
-                    {
-                        Weapon weapon = ship.weapons[j];
-                        WeaponRefs refs = weapon.refs;
+                if (t < weapon.nextRefireTime) continue;
+                weapon.nextRefireTime = t + refs.spec.refireDelay;
 
-                        if (t < weapon.nextRefireTime) continue;
-                        weapon.nextRefireTime = t + refs.spec.refireDelay;
-
-                        ProjectileRefs pr = state.projectilePool.Spawn();
-                        pr.rigidbody.tag = Tag.Player;
-                        pr.rigidbody.position = refs.fireTransform.position;
-                        // TODO: Ensure this rotation is correct
-                        pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
-                        pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
-                        state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
-
-                        ship.weapons[j] = weapon;
-                    }
-                    break;
-                }
+                ProjectileRefs pr = state.projectilePool.Spawn();
+                pr.rigidbody.tag = Tag.Player;
+                pr.rigidbody.position = refs.fireTransform.position;
+                // TODO: Ensure this rotation is correct
+                pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
+                pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
+                state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
             }
+
+            ship.weapons[j] = weapon;
         }
-        input.events.Clear();
+        input = new ShipInput();
     }
 
     void FixedUpdate()
@@ -214,7 +202,7 @@ public class Entrypoint : MonoBehaviour
             Vector3 targetPos = 3.0f * relPos.normalized;
             Vector3 deltaPos = targetPos - relPos;
             enemy.common.input.throttle = Vector3.ClampMagnitude(deltaPos, 1.0f);
-            enemy.common.input.events.Add(ShipInputEvent.Shoot);
+            enemy.common.input.shoot = true;
 
             ProcessShipMovement(ref enemy.common);
             ProcessShipEvents(ref enemy.common, null);
