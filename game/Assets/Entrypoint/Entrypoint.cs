@@ -10,6 +10,8 @@ public class Entrypoint : MonoBehaviour
     public new CameraRefs camera;
     public ShipRefs playerPrefab;
     public WeaponRefs weaponPrefab;
+    public WeaponSpec playerWeaponSpec;
+    public WeaponSpec enemyWeaponSpec;
     public ProjectileRefs projectilePrefab;
     public DebrisRefs[] debrisPrefabs;
     public ShipRefs[] enemyPrefabs;
@@ -22,7 +24,7 @@ public class Entrypoint : MonoBehaviour
         return Input.GetKey(key) ? 1 : 0;
     }
 
-    void AddWeapon(ref ShipCommon ship, Vector3 relPos)
+    void AddWeapon(ref ShipCommon ship, WeaponSpec spec, Vector3 relPos)
     {
         Transform parent = ship.refs.physicsTransform;
 
@@ -30,101 +32,12 @@ public class Entrypoint : MonoBehaviour
         weapon.refs = state.weaponPool.Spawn();
         weapon.refs.transform.parent = parent;
         weapon.refs.transform.localPosition = relPos;
+        weapon.spec = spec;
         // NOTE: Assume x is down
         float angle = Vector2.SignedAngle(relPos, Vector2.down);
         Assert.IsTrue(angle >= -180 && angle <= 180);
         if (angle < 0) weapon.refs.transform.MulScaleX(-1.0f);
         ship.weapons.Add(weapon);
-    }
-
-    void Awake()
-    {
-        state.weaponPool = new Pool<WeaponRefs>();
-        state.weaponPool.Initialize(weaponPrefab, 32);
-        state.projectilePool = new Pool<ProjectileRefs>();
-        state.projectilePool.Initialize(projectilePrefab, 64);
-        state.projectiles = new List<Projectile>(64);
-
-        state.debrisPools = new Pool<DebrisRefs>[debrisPrefabs.Length];
-        for (int i = 0; i < debrisPrefabs.Length; i++)
-        {
-            DebrisRefs prefab = debrisPrefabs[i];
-            var pool = new Pool<DebrisRefs>();
-            pool.Initialize(prefab, 32);
-            state.debrisPools[i] = pool;
-        }
-
-        state.enemyPools = new Pool<ShipRefs>[enemyPrefabs.Length];
-        for (int i = 0; i < enemyPrefabs.Length; i++)
-        {
-            ShipRefs prefab = enemyPrefabs[i];
-            var pool = new Pool<ShipRefs>();
-            pool.Initialize(prefab, 16);
-            state.enemyPools[i] = pool;
-        }
-
-        state.colliderCache = new Collider2D[32];
-
-        // Spawn player
-        {
-            state.player.common.refs = Instantiate(playerPrefab);
-            state.player.common.weapons = new List<Weapon>(2);
-            AddWeapon(ref state.player.common, new Vector3(-0.25f, 0.0f, 0.0f));
-            AddWeapon(ref state.player.common, new Vector3(+0.25f, 0.0f, 0.0f));
-        }
-
-        // DEBUG: Spawn a bunch of debris
-        for (int i = 0; i < 20; i++)
-        {
-            Pool<DebrisRefs> pool = RandomEx.Element(state.debrisPools);
-            DebrisRefs debris = pool.Spawn();
-            debris.rigidbody.position = 10.0f * Random.insideUnitCircle;
-            debris.rigidbody.rotation = 360.0f * Random.value;
-            debris.rigidbody.AddForce(Random.insideUnitCircle, ForceMode2D.Impulse);
-        }
-
-        // TODO: Figure out player-enemy collisions!
-        // DEBUG: Spawn an enemy
-        if (false)
-        {
-            Pool<ShipRefs> pool = RandomEx.Element(state.enemyPools);
-            var es = new EnemyShip();
-            es.common.refs = pool.Spawn();
-            es.common.weapons = new List<Weapon>(2);
-
-            es.common.move.p = new Vector2(5, 0);
-            AddWeapon(ref es.common, new Vector3(-1.0f, 0.0f, 0.0f));
-            AddWeapon(ref es.common, new Vector3(+1.0f, 0.0f, 0.0f));
-            es.target = state.player.common.refs;
-
-            state.enemies.Add(es);
-        }
-    }
-
-    void Update()
-    {
-        // NOTE: Input only!
-
-        ref MoveState mv = ref state.player.common.move;
-        ref ShipInput ip = ref state.player.common.input;
-
-        // Move
-        Vector3 throttle = new Vector3();
-        throttle.x = GetKeyValue(KeyCode.D) - GetKeyValue(KeyCode.A);
-        throttle.y = GetKeyValue(KeyCode.W) - GetKeyValue(KeyCode.S);
-        throttle = Vector3.ClampMagnitude(throttle, 1.0f);
-        ip.throttle = throttle;
-
-        // Aim
-        Assert.IsTrue(camera.camera.transform.forward == Vector3.forward);
-        Vector3 mouseWS = camera.camera.ScreenToWorldPoint(Input.mousePosition); mouseWS.z = 0;
-        ip.aim = (mouseWS - mv.p).normalized;
-
-        // Shoot
-        ip.shoot = Input.GetKey(KeyCode.Mouse0) | Input.GetKey(KeyCode.Space);
-
-        if (Input.GetKeyDown("r"))
-            SceneManager.LoadScene("Level"); //Load scene called Game
     }
 
     static void ProcessShipMovement(ref ShipCommon ship)
@@ -153,7 +66,16 @@ public class Entrypoint : MonoBehaviour
         rigidbody.rotation = Vector2.SignedAngle(Vector2.up, move.look);
     }
 
-    void ProcessShipEvents(ref ShipCommon ship, List<DebrisRefs> debris)
+    Vector3 CalculateWeaponDirection(Vector3 shipDir, Vector3 weaponDir)
+    {
+        // HACK: This is just stupid
+        Quaternion a = Quaternion.FromToRotation(Vector3.up, shipDir);
+        Quaternion b = Quaternion.FromToRotation(shipDir, weaponDir);
+        Vector3 direction = a * b * Vector3.up;
+        return direction;
+    }
+
+    void ProcessShipWeapons(ref ShipCommon ship)
     {
         float t = Time.fixedTime;
         ref ShipInput input = ref ship.input;
@@ -161,26 +83,120 @@ public class Entrypoint : MonoBehaviour
         for (int j = 0; j < ship.weapons.Count; j++)
         {
             Weapon weapon = ship.weapons[j];
+            WeaponRefs refs = weapon.refs;
+            WeaponSpec spec = weapon.spec;
 
-            if (input.shoot)
+            Vector3 desiredAim = input.point - refs.fireTransform.position;
+            weapon.aim = Vector3.Lerp(weapon.aim, desiredAim, spec.turnSpeed);
+
+            if (input.shoot && t >= weapon.nextRefireTime)
             {
-                WeaponRefs refs = weapon.refs;
+                weapon.nextRefireTime = t + spec.refireDelay;
 
-                if (t < weapon.nextRefireTime) continue;
-                weapon.nextRefireTime = t + refs.spec.refireDelay;
+                Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
 
                 ProjectileRefs pr = state.projectilePool.Spawn();
                 pr.rigidbody.tag = Tag.Player;
                 pr.rigidbody.position = refs.fireTransform.position;
-                // TODO: Ensure this rotation is correct
-                pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, input.aim);
-                pr.rigidbody.AddForce(pr.spec.impulse * input.aim, ForceMode2D.Impulse);
-                state.projectiles.Add(new Projectile() { refs = pr, lifetime = pr.spec.lifetime });
+                pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, aim);
+                pr.rigidbody.AddForce(spec.impulse * aim, ForceMode2D.Impulse);
+                state.projectiles.Add(new Projectile() { refs = pr, lifetime = spec.lifetime });
             }
 
             ship.weapons[j] = weapon;
         }
         input = new ShipInput();
+    }
+
+    void Awake()
+    {
+        state.weaponPool = new Pool<WeaponRefs>();
+        state.weaponPool.Initialize(weaponPrefab, 32);
+        state.projectilePool = new Pool<ProjectileRefs>();
+        state.projectilePool.Initialize(projectilePrefab, 128);
+        state.projectiles = new List<Projectile>(128);
+
+        state.debrisPools = new Pool<DebrisRefs>[debrisPrefabs.Length];
+        for (int i = 0; i < debrisPrefabs.Length; i++)
+        {
+            DebrisRefs prefab = debrisPrefabs[i];
+            var pool = new Pool<DebrisRefs>();
+            pool.Initialize(prefab, 32);
+            state.debrisPools[i] = pool;
+        }
+
+        state.enemyPools = new Pool<ShipRefs>[enemyPrefabs.Length];
+        for (int i = 0; i < enemyPrefabs.Length; i++)
+        {
+            ShipRefs prefab = enemyPrefabs[i];
+            var pool = new Pool<ShipRefs>();
+            pool.Initialize(prefab, 16);
+            state.enemyPools[i] = pool;
+        }
+
+        state.colliderCache = new Collider2D[32];
+
+        // Spawn player
+        {
+            state.player.common.refs = Instantiate(playerPrefab);
+            state.player.common.weapons = new List<Weapon>(2);
+            AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
+            AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
+        }
+
+        // DEBUG: Spawn a bunch of debris
+        for (int i = 0; i < 20; i++)
+        {
+            Pool<DebrisRefs> pool = RandomEx.Element(state.debrisPools);
+            DebrisRefs debris = pool.Spawn();
+            debris.rigidbody.position = 10.0f * Random.insideUnitCircle;
+            debris.rigidbody.rotation = 360.0f * Random.value;
+            debris.rigidbody.AddForce(Random.insideUnitCircle, ForceMode2D.Impulse);
+        }
+
+        // TODO: Figure out player-enemy collisions!
+        // DEBUG: Spawn an enemy
+        if (false)
+        {
+            Pool<ShipRefs> pool = RandomEx.Element(state.enemyPools);
+            var es = new EnemyShip();
+            es.common.refs = pool.Spawn();
+            es.common.weapons = new List<Weapon>(2);
+
+            es.common.move.p = new Vector2(5, 0);
+            AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
+            AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(+1.0f, 0.0f, 0.0f));
+            es.target = state.player.common.refs;
+
+            state.enemies.Add(es);
+        }
+    }
+
+    void Update()
+    {
+        // NOTE: Input only!
+
+        ref MoveState move = ref state.player.common.move;
+        ref ShipInput input = ref state.player.common.input;
+
+        // Move
+        Vector3 throttle = new Vector3();
+        throttle.x = GetKeyValue(KeyCode.D) - GetKeyValue(KeyCode.A);
+        throttle.y = GetKeyValue(KeyCode.W) - GetKeyValue(KeyCode.S);
+        throttle = Vector3.ClampMagnitude(throttle, 1.0f);
+        input.throttle = throttle;
+
+        // Aim
+        Assert.IsTrue(camera.camera.transform.forward == Vector3.forward);
+        input.point = camera.camera.ScreenToWorldPoint(Input.mousePosition); input.point.z = 0;
+        input.aim = (input.point - move.p).normalized;
+
+        // Shoot
+        input.shoot = Input.GetKey(KeyCode.Mouse0) | Input.GetKey(KeyCode.Space);
+
+        // HACK: Reset
+        if (Input.GetKeyDown(KeyCode.R))
+            SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
     void FixedUpdate()
@@ -191,21 +207,25 @@ public class Entrypoint : MonoBehaviour
         ref PlayerShip player = ref state.player;
 
         ProcessShipMovement(ref player.common);
-        ProcessShipEvents(ref player.common, player.debris);
+        ProcessShipWeapons(ref player.common);
 
         for (int i = 0; i < state.enemies.Count; i++)
         {
             EnemyShip enemy = state.enemies[i];
+            ref MoveState move = ref enemy.common.move;
+            ref ShipInput input = ref enemy.common.input;
 
             // (Shitty) AI
-            Vector3 relPos = enemy.common.move.p - (Vector3) enemy.target.rigidbody.position;
+            Vector3 relPos = move.p - (Vector3) enemy.target.rigidbody.position;
             Vector3 targetPos = 3.0f * relPos.normalized;
             Vector3 deltaPos = targetPos - relPos;
-            enemy.common.input.throttle = Vector3.ClampMagnitude(deltaPos, 1.0f);
-            enemy.common.input.shoot = true;
+            input.throttle = Vector3.ClampMagnitude(deltaPos, 1.0f);
+            input.aim = deltaPos.normalized;
+            // TODO: Fix this
+            input.shoot = Vector2.Angle(move.look, input.aim) < 22;
 
             ProcessShipMovement(ref enemy.common);
-            ProcessShipEvents(ref enemy.common, null);
+            ProcessShipWeapons(ref enemy.common);
             state.enemies[i] = enemy;
         }
 
@@ -296,12 +316,17 @@ public class Entrypoint : MonoBehaviour
 
         if (EditorApplication.isPlaying)
         {
+            Gizmos.color = Color.white;
+            Gizmos.DrawLine(ship.move.p, ship.move.p + input.aim);
+
             Gizmos.color = Color.green;
             for (int i = 0; i < ship.weapons.Count; i++)
             {
                 Weapon weapon = ship.weapons[i];
                 Vector3 pos = weapon.refs.fireTransform.position;
-                Gizmos.DrawLine(pos, pos + input.aim);
+                Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
+                Gizmos.DrawSphere(pos, 0.1f);
+                Gizmos.DrawLine(pos, pos + aim);
             }
         }
 

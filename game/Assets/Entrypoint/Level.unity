@@ -154,6 +154,8 @@ MonoBehaviour:
     type: 3}
   weaponPrefab: {fileID: 6795343969222469785, guid: 3999d4b6a3b126b40b9063f44b5c4a80,
     type: 3}
+  playerWeaponSpec: {fileID: 11400000, guid: 6c6d17c0861392e428314822f0a610ed, type: 2}
+  enemyWeaponSpec: {fileID: 11400000, guid: 29e1fd8c927f8064faeaaa346a31cf95, type: 2}
   projectilePrefab: {fileID: 4004167460313986225, guid: 76552e3c3a9fa1d4e96406d8aa608e24,
     type: 3}
   debrisPrefabs:
@@ -170,20 +172,21 @@ MonoBehaviour:
   - {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1, type: 3}
   state:
     player:
-      refs: {fileID: 0}
-      move:
-        p: {x: 0, y: 0, z: 0}
-        dp: {x: 0, y: 0, z: 0}
-      input:
-        throttle: {x: 0, y: 0, z: 0}
-        aim: {x: 0, y: 0, z: 0}
-        events: 
-      weapons: []
+      common:
+        refs: {fileID: 0}
+        move:
+          p: {x: 0, y: 0, z: 0}
+          dp: {x: 0, y: 0, z: 0}
+          look: {x: 0, y: 0, z: 0}
+        input:
+          throttle: {x: 0, y: 0, z: 0}
+          aim: {x: 0, y: 0, z: 0}
+          shoot: 0
+        weapons: []
       debris: []
     projectiles: []
     enemies: []
     colliderCache: []
-    lastProjectileSpawn: {x: 0, y: 0, z: 0}
 --- !u!4 &243272047
 Transform:
   m_ObjectHideFlags: 0
