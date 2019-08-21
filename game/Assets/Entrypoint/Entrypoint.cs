@@ -105,7 +105,13 @@ public class Entrypoint : MonoBehaviour
 
             ship.weapons[j] = weapon;
         }
+
+        // HACK: Unity input is a pile of radioactive garbage
+        ShipInput prevInput = input;
         input = new ShipInput();
+        input.throttle = prevInput.throttle;
+        input.point = prevInput.point;
+        input.aim = prevInput.aim;
     }
 
     void Awake()
