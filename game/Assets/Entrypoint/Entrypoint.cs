@@ -279,9 +279,10 @@ public class Entrypoint : MonoBehaviour
             Vector3 desiredP = targetP - (5.0f * toTarget.normalized);
             Vector3 toDesired = desiredP - move.p;
 
-            float deltaPosMag = toDesired.magnitude;
-            if (deltaPosMag > 1.0f)
-                input.throttle = Vector3.ClampMagnitude(toDesired, 1.0f);
+            float distToDesired = toDesired.magnitude;
+            float throttle = Mathf.Lerp(0, 1, (distToDesired - 0.75f) / 3.0f);
+
+            input.throttle = (throttle / distToDesired) * toDesired;
             input.shoot = Vector2.Angle(move.look, input.aim) < 22;
 
             ProcessShipMovement(ref enemy.common);
