@@ -180,6 +180,7 @@ MonoBehaviour:
           look: {x: 0, y: 0, z: 0}
         input:
           throttle: {x: 0, y: 0, z: 0}
+          point: {x: 0, y: 0, z: 0}
           aim: {x: 0, y: 0, z: 0}
           shoot: 0
         weapons: []

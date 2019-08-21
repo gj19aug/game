@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: objectglow
-  m_Shader: {fileID: -6465566751694194690, guid: fca4e9c76e3ddb14cb035b935dc16742,
+  m_Name: dissolve
+  m_Shader: {fileID: -6465566751694194690, guid: f9c38fbe87df6bb49aec542868de2b0d,
     type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
@@ -20,6 +20,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_25033A01:
+        m_Texture: {fileID: 2800000, guid: 97b65c4074ff9c84c80115bb67c1f6ec, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -48,8 +52,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_8BD5010B_Out_0:
+        m_Texture: {fileID: 2800000, guid: 97b65c4074ff9c84c80115bb67c1f6ec, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_8F9894FE: 1
+    - Vector1_1B3F96F8: 0
+    - Vector1_1EB3EE0: 0.02
+    - Vector1_DAA0D794: 30
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -72,12 +82,12 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_70DB6E04: {r: 0.2587014, g: 1.034805, b: 1.027414, a: 0}
+    - Color_91581725: {r: 0, g: 1.8969873, b: 2.2931933, a: 1}
     - _BaseColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
---- !u!114 &6096509296112437920
+--- !u!114 &955126067107915647
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
