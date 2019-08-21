@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78a5a8a230c5632408a46088ba384fb1, type: 3}
-  m_Name: Basic Movement
+  m_Name: Enemy Movement
   m_EditorClassIdentifier: 
   acceleration: 19
   drag: 3

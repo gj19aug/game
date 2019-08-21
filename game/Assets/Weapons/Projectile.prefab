@@ -4800,7 +4800,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 6114217463211529905}
   collider: {fileID: 3051263137064202600}
-  spec: {fileID: 11400000, guid: 6c6d17c0861392e428314822f0a610ed, type: 2}
 --- !u!82 &261945219819569086
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4962,7 +4961,7 @@ CircleCollider2D:
   m_GameObject: {fileID: 3934405321964963808}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 776045584454d2247ba1b75895cf3032, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0

@@ -19,6 +19,7 @@ public struct GameState
     // Enemies
     public Pool<ShipRefs>[] enemyPools;
     public List<EnemyShip> enemies;
+    public Spawn[] enemySpawns;
 
     // Cache
     public Collider2D[] colliderCache;
@@ -81,6 +82,14 @@ public struct Projectile
 {
     public ProjectileRefs refs;
     public float lifetime;
+}
+
+[Serializable]
+public struct Spawn
+{
+    public SpawnRefs refs;
+    public float nextSpawnTime;
+    public List<ShipRefs> ships;
 }
 
 public static class Tag
