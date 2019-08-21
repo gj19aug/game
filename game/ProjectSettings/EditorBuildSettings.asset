@@ -8,4 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Entrypoint/Level.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Menus/StartMenu.unity
+    guid: c55a9a81d15068b4499fc41846701e0b
+  - enabled: 1
+    path: Assets/Menus/HowToPlay.unity
+    guid: cae5c766175eee347914b9750cd4bfdb
   m_configObjects: {}
