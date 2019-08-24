@@ -13,6 +13,7 @@ public class Entrypoint : MonoBehaviour
     public WeaponSpec playerWeaponSpec;
     public WeaponSpec enemyWeaponSpec;
     public ProjectileRefs projectilePrefab;
+    public SpawnRefs[] enemySpawns;
     public DebrisRefs[] debrisPrefabs;
     public ShipRefs[] enemyPrefabs;
 
@@ -29,7 +30,7 @@ public class Entrypoint : MonoBehaviour
         Transform parent = ship.refs.physicsTransform;
 
         var weapon = new Weapon();
-        weapon.refs = state.weaponPool.Spawn();
+        weapon.refs = SpawnFromPoolSet(state.weaponPool);
         weapon.refs.transform.parent = parent;
         weapon.refs.transform.localPosition = relPos;
         weapon.spec = spec;
@@ -87,7 +88,7 @@ public class Entrypoint : MonoBehaviour
             WeaponSpec spec = weapon.spec;
 
             Vector3 desiredAim = input.point - refs.fireTransform.position;
-            weapon.aim = Vector3.Lerp(weapon.aim, desiredAim, spec.turnSpeed);
+            weapon.aim = Vector3.Slerp(weapon.aim, desiredAim, spec.turnSpeed);
 
             if (input.shoot && t >= weapon.nextRefireTime)
             {
@@ -95,7 +96,7 @@ public class Entrypoint : MonoBehaviour
 
                 Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
 
-                ProjectileRefs pr = state.projectilePool.Spawn();
+                ProjectileRefs pr = SpawnFromPoolSet(state.projectilePool);
                 pr.rigidbody.tag = Tag.Player;
                 pr.rigidbody.position = refs.fireTransform.position;
                 pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, aim);
@@ -105,33 +106,87 @@ public class Entrypoint : MonoBehaviour
 
             ship.weapons[j] = weapon;
         }
+
+        // HACK: Unity input is a pile of radioactive garbage
+        ShipInput prevInput = input;
         input = new ShipInput();
+        input.throttle = prevInput.throttle;
+        input.point = prevInput.point;
+        input.aim = prevInput.aim;
+    }
+
+    Pool<T> CreatePoolSet<T>(T prefab, int poolCount) where T : MonoBehaviour
+    {
+        var pool = new Pool<T>();
+        pool.Initialize(prefab, poolCount);
+        return pool;
+    }
+
+    T SpawnFromPoolSet<T>(Pool<T> pool) where T : MonoBehaviour
+    {
+        T instance = pool.Spawn();
+        return instance;
+    }
+
+    Pool<T>[] CreatePoolSet<T>(T[] prefabs, int poolCount) where T : MonoBehaviour
+    {
+        var pools = new Pool<T>[prefabs.Length];
+        for (int i = 0; i < prefabs.Length; i++)
+        {
+            T prefab = prefabs[i];
+            var pool = new Pool<T>();
+            pool.Initialize(prefab, poolCount);
+            pools[i] = pool;
+        }
+        return pools;
+    }
+
+    T SpawnFromPoolSet<T>(Pool<T>[] pools) where T : MonoBehaviour
+    {
+        Pool<T> pool = RandomEx.Element(pools);
+        T instance = pool.Spawn();
+        return instance;
+    }
+
+    int SpawnEnemy(Vector3 position)
+    {
+        var es = new EnemyShip();
+        es.common.refs = SpawnFromPoolSet(state.enemyPools);
+        es.common.weapons = new List<Weapon>(2);
+
+        es.common.move.p = position;
+        AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
+        AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(+1.0f, 0.0f, 0.0f));
+        es.target = state.player.common.refs;
+
+        // TODO: Just implement a list with ref return already. Ugh.
+        state.enemies.Add(es);
+        return state.enemies.Count - 1;
+    }
+
+    void DespawnEnemy()
+    {
+
     }
 
     void Awake()
     {
-        state.weaponPool = new Pool<WeaponRefs>();
-        state.weaponPool.Initialize(weaponPrefab, 32);
-        state.projectilePool = new Pool<ProjectileRefs>();
-        state.projectilePool.Initialize(projectilePrefab, 128);
+        float t = Time.fixedTime;
+
+        state.weaponPool = CreatePoolSet(weaponPrefab, 32);
+        state.projectilePool = CreatePoolSet(projectilePrefab, 128);
         state.projectiles = new List<Projectile>(128);
+        state.debrisPools = CreatePoolSet(debrisPrefabs, 32);
+        state.enemyPools = CreatePoolSet(enemyPrefabs, 16);
 
-        state.debrisPools = new Pool<DebrisRefs>[debrisPrefabs.Length];
-        for (int i = 0; i < debrisPrefabs.Length; i++)
+        state.enemySpawns = new Spawn[enemySpawns.Length];
+        for (int i = 0; i < enemySpawns.Length; i++)
         {
-            DebrisRefs prefab = debrisPrefabs[i];
-            var pool = new Pool<DebrisRefs>();
-            pool.Initialize(prefab, 32);
-            state.debrisPools[i] = pool;
-        }
-
-        state.enemyPools = new Pool<ShipRefs>[enemyPrefabs.Length];
-        for (int i = 0; i < enemyPrefabs.Length; i++)
-        {
-            ShipRefs prefab = enemyPrefabs[i];
-            var pool = new Pool<ShipRefs>();
-            pool.Initialize(prefab, 16);
-            state.enemyPools[i] = pool;
+            SpawnRefs refs = enemySpawns[i];
+            ref Spawn spawn = ref state.enemySpawns[i];
+            spawn.refs = refs;
+            spawn.nextSpawnTime = t + refs.spec.timeBetweenSpawns;
+            spawn.ships = new List<ShipRefs>(refs.spec.maxCount);
         }
 
         state.colliderCache = new Collider2D[32];
@@ -145,31 +200,19 @@ public class Entrypoint : MonoBehaviour
         }
 
         // DEBUG: Spawn a bunch of debris
+        #if false
         for (int i = 0; i < 20; i++)
         {
-            Pool<DebrisRefs> pool = RandomEx.Element(state.debrisPools);
-            DebrisRefs debris = pool.Spawn();
+            DebrisRefs debris = SpawnFromPoolSet(state.debrisPools);
             debris.rigidbody.position = 10.0f * Random.insideUnitCircle;
             debris.rigidbody.rotation = 360.0f * Random.value;
             debris.rigidbody.AddForce(Random.insideUnitCircle, ForceMode2D.Impulse);
         }
+        #endif
 
         // TODO: Figure out player-enemy collisions!
         // DEBUG: Spawn an enemy
-        if (false)
-        {
-            Pool<ShipRefs> pool = RandomEx.Element(state.enemyPools);
-            var es = new EnemyShip();
-            es.common.refs = pool.Spawn();
-            es.common.weapons = new List<Weapon>(2);
-
-            es.common.move.p = new Vector2(5, 0);
-            AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
-            AddWeapon(ref es.common, enemyWeaponSpec, new Vector3(+1.0f, 0.0f, 0.0f));
-            es.target = state.player.common.refs;
-
-            state.enemies.Add(es);
-        }
+        //SpawnEnemy(new Vector3(5, 0, 0));
     }
 
     void Update()
@@ -203,9 +246,21 @@ public class Entrypoint : MonoBehaviour
     {
         // NOTE: Simulate!
 
+        float t = Time.fixedTime;
         float dt = Time.fixedDeltaTime;
-        ref PlayerShip player = ref state.player;
 
+        // Projectile Impacts
+        for (int i = state.projectiles.Count - 1; i >= 0 ; i--)
+        {
+            Projectile p = state.projectiles[i];
+            int count = p.refs.rigidbody.GetContacts(state.colliderCache);
+            if (count == 0) continue;
+            //Collider2D collider = state.colliderCache[0];
+            state.projectilePool.Despawn(p.refs);
+            state.projectiles.RemoveAt(i);
+        }
+
+        ref PlayerShip player = ref state.player;
         ProcessShipMovement(ref player.common);
         ProcessShipWeapons(ref player.common);
 
@@ -216,12 +271,18 @@ public class Entrypoint : MonoBehaviour
             ref ShipInput input = ref enemy.common.input;
 
             // (Shitty) AI
-            Vector3 relPos = move.p - (Vector3) enemy.target.rigidbody.position;
-            Vector3 targetPos = 3.0f * relPos.normalized;
-            Vector3 deltaPos = targetPos - relPos;
-            input.throttle = Vector3.ClampMagnitude(deltaPos, 1.0f);
-            input.aim = deltaPos.normalized;
-            // TODO: Fix this
+            Vector3 targetP = enemy.target.rigidbody.position;
+            Vector3 toTarget = targetP - move.p;
+            input.point = targetP;
+            input.aim = toTarget.normalized;
+
+            Vector3 desiredP = targetP - (5.0f * toTarget.normalized);
+            Vector3 toDesired = desiredP - move.p;
+
+            float distToDesired = toDesired.magnitude;
+            float throttle = Mathf.Lerp(0, 1, (distToDesired - 0.75f) / 3.0f);
+
+            input.throttle = (throttle / distToDesired) * toDesired;
             input.shoot = Vector2.Angle(move.look, input.aim) < 22;
 
             ProcessShipMovement(ref enemy.common);
@@ -258,7 +319,7 @@ public class Entrypoint : MonoBehaviour
             int attachCount = refs.rigidbody.GetContacts(state.colliderCache);
             for (int i = 0; i < attachCount; i++)
             {
-                ref Collider2D collider = ref state.colliderCache[i];
+                Collider2D collider = state.colliderCache[i];
                 var dr = collider.GetComponentInParent<DebrisRefs>();
                 if (dr == null) continue;
 
@@ -302,6 +363,27 @@ public class Entrypoint : MonoBehaviour
                 rb.AddForce(force, ForceMode2D.Force);
             }
         }
+
+        // Spawning
+        {
+            for (int i = 0; i < state.enemySpawns.Length; i++)
+            {
+                ref Spawn spawn = ref state.enemySpawns[i];
+                SpawnSpec spec = spawn.refs.spec;
+
+                if (spawn.ships.Count < spec.maxCount)
+                {
+                    if (t >= spawn.nextSpawnTime)
+                    {
+                        // BUG: Floating point issues for large time
+                        spawn.nextSpawnTime += spec.timeBetweenSpawns;
+                        Vector3 pos = spawn.refs.transform.position + (Vector3) (5.0f * Random.insideUnitCircle);
+                        int index = SpawnEnemy(pos);
+                        spawn.ships.Add(state.enemies[index].common.refs);
+                    }
+                }
+            }
+        }
     }
 
     #if UNITY_EDITOR
@@ -311,21 +393,16 @@ public class Entrypoint : MonoBehaviour
 
         ref ShipCommon ship = ref state.player.common;
         ref ShipRefs refs = ref state.player.common.refs;
-        ref ShipInput input = ref state.player.common.input;
         ref MagnetismSpec mag = ref state.player.common.refs.magnetismSpec;
 
         if (EditorApplication.isPlaying)
         {
-            Gizmos.color = Color.white;
-            Gizmos.DrawLine(ship.move.p, ship.move.p + input.aim);
-
             Gizmos.color = Color.green;
             for (int i = 0; i < ship.weapons.Count; i++)
             {
                 Weapon weapon = ship.weapons[i];
                 Vector3 pos = weapon.refs.fireTransform.position;
                 Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
-                Gizmos.DrawSphere(pos, 0.1f);
                 Gizmos.DrawLine(pos, pos + aim);
             }
         }
