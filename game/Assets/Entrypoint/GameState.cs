@@ -13,6 +13,9 @@ public struct GameState
     public Pool<ProjectileRefs> projectilePool;
     public List<Projectile> projectiles;
 
+    // Visual FX
+    public RefList<ImpactEffect> impactEffect;
+
     // Debris
     public Pool<DebrisRefs>[] debrisPools;
 
@@ -97,7 +100,16 @@ public struct Impact
     public WeaponSpec spec;
     public ShipRefs owner;
     public ShipRefs victim;
+    public Vector3 position;
 }
+
+[Serializable]
+public struct ImpactEffect
+{
+    public GameObject gameObject;
+    public float lifetime;
+}
+
 
 [Serializable]
 public struct Spawn

@@ -451,24 +451,8 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: -2299728369730618024, guid: 168d83b77a0742d468562c467aec61a4, type: 3}
   - {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1, type: 3}
-  state:
-    player:
-      common:
-        refs: {fileID: 0}
-        move:
-          p: {x: 0, y: 0, z: 0}
-          dp: {x: 0, y: 0, z: 0}
-          look: {x: 0, y: 0, z: 0}
-        input:
-          throttle: {x: 0, y: 0, z: 0}
-          point: {x: 0, y: 0, z: 0}
-          aim: {x: 0, y: 0, z: 0}
-          shoot: 0
-        health: 0
-      debris: []
-    projectiles: []
-    enemySpawns: []
-    colliderCache: []
+  impactPrefabs:
+  - {fileID: 7581091287619798918, guid: db9fcde46778fa54590ea53fb96cd4fc, type: 3}
 --- !u!4 &243272047
 Transform:
   m_ObjectHideFlags: 0

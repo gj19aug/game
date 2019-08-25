@@ -16,6 +16,7 @@ public class Entrypoint : MonoBehaviour
     public SpawnRefs[] enemySpawns;
     public DebrisRefs[] debrisPrefabs;
     public ShipRefs[] enemyPrefabs;
+    public GameObject[] impactPrefabs;
 
     // Game State
     private GameState state;
@@ -302,6 +303,7 @@ public class Entrypoint : MonoBehaviour
         state.debrisPools = CreatePoolSet(debrisPrefabs, 128);
         state.enemyPools = CreatePoolSet(enemyPrefabs, 3);
         state.enemies = new RefList<EnemyShip>(32);
+        state.impactEffect = new RefList<ImpactEffect>(3);
 
         state.enemySpawns = new Spawn[enemySpawns.Length];
         for (int i = 0; i < enemySpawns.Length; i++)
@@ -394,11 +396,21 @@ public class Entrypoint : MonoBehaviour
                 if (victim != null)
                 {
                     ref Impact impact = ref state.impactCache.Add();
+                    impact.position = p.refs.rigidbody.transform.position;
                     impact.spec = p.spec;
                     impact.owner = p.owner;
                     impact.victim = victim;
                     break;
                 }
+            }
+        }
+
+        for (int i = state.impactEffect.Count - 1; i >= 0; i--)
+        {
+            state.impactEffect[i].lifetime -= dt;
+            if (state.impactEffect[i].lifetime <= 0.0f)
+            {
+                Destroy(state.impactEffect[i].gameObject);
             }
         }
 
@@ -412,6 +424,13 @@ public class Entrypoint : MonoBehaviour
                 if (!ShipExists(impact.victim)) continue;
                 ref ShipCommon s = ref FindShip(impact.victim);
                 ProcessShipImpact(ref s, ref impact);
+
+                // VFX
+                ImpactEffect hitFx = new ImpactEffect();
+                hitFx.gameObject = Instantiate(impactPrefabs[0], impact.position, Quaternion.identity);
+                
+                hitFx.lifetime = 1.0f;
+                state.impactEffect.Add(hitFx);
             }
         }
         state.impactCache.Clear();
