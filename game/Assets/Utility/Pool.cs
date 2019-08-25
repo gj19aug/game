@@ -34,6 +34,11 @@ public class Pool<T> where T : MonoBehaviour
             CreateInstance(prefab);
     }
 
+    public bool Contains(T instance)
+    {
+        return active.Contains(instance) || pool.Contains(instance);
+    }
+
     bool warned = false;
     public T Spawn()
     {

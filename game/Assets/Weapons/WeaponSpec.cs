@@ -15,4 +15,7 @@ public class WeaponSpec : ScriptableObject
     [Tooltip("How fast the weapon is capable of turning. Units are incomprehensible.")]
     [Range(0, 1)]
     public float turnSpeed = 0.1f;
+
+    [Range(1, 100)]
+    public int damage = 1;
 }

@@ -9849,7 +9849,7 @@ MonoBehaviour:
   physicsTransform: {fileID: 2929166087655165195}
   collider: {fileID: 6035380426762517434}
   sprite: {fileID: 2314150933081313797}
-  moveSpec: {fileID: 11400000, guid: c26b0daa982e41940be3098c1c0d84d5, type: 2}
+  shipSpec: {fileID: 11400000, guid: c26b0daa982e41940be3098c1c0d84d5, type: 2}
   magnetismSpec: {fileID: 11400000, guid: c890f98be33c0094bbbf192b47e10319, type: 2}
 --- !u!1 &4905866949409695996
 GameObject:

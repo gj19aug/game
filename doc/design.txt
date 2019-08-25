@@ -5,28 +5,31 @@ Adam - MVP Mechanics
 Corey - Paper Design
 Chris - HUD Exploration, SFX
 
+
 MVP
 ---
 Art
-	Turrets
-	General Rubbish
-	Ship - Magnet
-	Propulsion
-	Backdrop
-	Ship - Enemy
-	Projectiles
+	[+] Turrets
+	[+] General Rubbish
+	[+] Ship - Magnet
+	[+] Propulsion
+	[+] Backdrop
+	[+] Ship - Enemy
+	[+] Projectiles
 
 Mechanics
 	[+] Movement
 	[+] Shooting
 	[+] Basic Camera
 	[+] Magnetism
-	[ ] Enemy Waves
-	[ ] Enemy AI
-	[ ] Basic Collision
+	[+] Enemy Ship
+	[+] Enemy AI
+	[+] Turrets
+	[+] Dynamic Ships
+	[+] Design Tools
+	[+] Projectile Collision
 	[ ] Health
-	[ ] Dynamic Ships
-	[ ] Design Tools
+	[ ] Thrusters
 
 
 Mechanics (Ordered)
@@ -76,6 +79,12 @@ Auto Play / Screen Saver Mode
 Cheat Codes
 
 
+Notes
+-----
+Enemies don't have friendly fire
+Going for enenmy numbers instead of complexity
+
+
 Big Open Questions
 ------------------
 Player Rotation
@@ -101,3 +110,4 @@ Randomized Debris Sizes
 Randomized SFX
 VFX
 Parallax
+Projectile Impact Effects

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class DebrisRefs : MonoBehaviour
+public class DebrisRefs : Refs
 {
     public new Transform transform;
     public new Rigidbody2D rigidbody;

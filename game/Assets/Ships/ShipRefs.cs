@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 
-public class ShipRefs : MonoBehaviour
+public class ShipRefs : Refs
 {
     public new Rigidbody2D rigidbody;
     public Transform physicsTransform;
     public new PolygonCollider2D collider;
     public SpriteRenderer sprite;
-    public MoveSpec moveSpec;
+    public ShipSpec shipSpec;
     public MagnetismSpec magnetismSpec;
 }
