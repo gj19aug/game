@@ -34,10 +34,9 @@ public class Pool<T> where T : MonoBehaviour
             CreateInstance(prefab);
     }
 
-    public bool Contains(T instance)
-    {
-        return active.Contains(instance) || pool.Contains(instance);
-    }
+    public bool IsSpawned(T instance) { return active.Contains(instance); }
+    public bool IsDespawned(T instance) { return pool.Contains(instance); }
+    public bool Contains(T instance) { return active.Contains(instance) || pool.Contains(instance); }
 
     bool warned = false;
     public T Spawn()
@@ -59,12 +58,21 @@ public class Pool<T> where T : MonoBehaviour
         return instance;
     }
 
-    public void Despawn(T instance)
+    public bool TryDespawn(T instance)
     {
         instance.gameObject.SetActive(false);
-        bool removed = active.Remove(instance);
+        if (active.Remove(instance))
+        {
+            pool.Add(instance);
+            return true;
+        }
+        return false;
+    }
+
+    public void Despawn(T instance)
+    {
+        bool removed = TryDespawn(instance);
         Assert.IsTrue(removed);
-        pool.Add(instance);
     }
 
     public bool Remove(T instance)

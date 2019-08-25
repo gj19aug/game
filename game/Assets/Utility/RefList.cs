@@ -54,7 +54,7 @@ public class RefList<T>
 			// Seriously, C#?
 			if (EqualityComparer<T>.Default.Equals(items[i], item))
 			{
-				Array.Copy(items, i, items, i + 1, count - i);
+				Array.Copy(items, i + 1, items, i, count - i - 1);
 				count -= 1;
 				return true;
 			}
@@ -64,7 +64,7 @@ public class RefList<T>
 
 	public void RemoveAt(int index)
 	{
-		Array.Copy(items, index, items, index + 1, count - index);
+		Array.Copy(items, index + 1, items, index, count - index - 1);
 		count -= 1;
 	}
 }
