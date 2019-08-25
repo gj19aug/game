@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1644,7 +1644,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: Navigate space using WASD and your mouse. Destroy asteroids and your enemies
     by aiming your reticle in the desired direction, and hold down the left mouse
-    button.
+    button to fire.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 29268309066344239a6f3e72b8f11e59, type: 2}
   m_sharedMaterial: {fileID: -7560856895416022755, guid: 29268309066344239a6f3e72b8f11e59,
@@ -1714,12 +1714,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 431647911}
-    characterCount: 162
+    characterCount: 170
     spriteCount: 0
-    spaceCount: 26
-    wordCount: 27
+    spaceCount: 28
+    wordCount: 29
     linkCount: 0
-    lineCount: 3
+    lineCount: 4
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
@@ -3055,7 +3055,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &693502074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4074,7 +4074,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1087833186
 MonoBehaviour:
   m_ObjectHideFlags: 0
