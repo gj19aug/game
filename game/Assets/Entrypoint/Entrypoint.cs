@@ -18,7 +18,7 @@ public class Entrypoint : MonoBehaviour
     public ShipRefs[] enemyPrefabs;
 
     // Game State
-    [HideInInspector] public GameState state;
+    private GameState state;
 
     public static int GetKeyValue(KeyCode key)
     {
@@ -42,7 +42,7 @@ public class Entrypoint : MonoBehaviour
         weapon.refs.transform.SetScaleX(Mathf.Sign(angle));
     }
 
-    void RemoveWeapon(ref ShipCommon ship)
+    void RemoveWeapons(ref ShipCommon ship)
     {
         for (int i = 0; i < ship.weapons.Count; i++)
         {
@@ -150,7 +150,8 @@ public class Entrypoint : MonoBehaviour
             if (ship.health <= 0)
             {
                 // TODO: Debris and effects
-                DespawnEnemy(ref FindEnemy(ship.refs));
+                ref EnemyShip e = ref FindEnemy(ship.refs);
+                DespawnEnemy(ref e);
             }
         }
     }
@@ -198,11 +199,8 @@ public class Entrypoint : MonoBehaviour
         for (int i = 0; i < pools.Length; i++)
         {
             Pool<T> pool = pools[i];
-            if (pool.Contains(instance))
-            {
-                pool.Despawn(instance);
+            if (pool.TryDespawn(instance))
                 return;
-            }
         }
         Assert.IsTrue(false);
     }
@@ -224,16 +222,17 @@ public class Entrypoint : MonoBehaviour
 
     void DespawnEnemy(ref EnemyShip enemy)
     {
-        for (int i = 0; i < enemy.common.weapons.Count; i++)
-            RemoveWeapon(ref enemy.common);
-        state.enemies.Remove(ref enemy);
-        DespawnFromPoolSet(state.enemyPools, enemy.common.refs);
+        EnemyShip e = enemy;
+        for (int i = 0; i < e.common.weapons.Count; i++)
+            RemoveWeapons(ref e.common);
+        state.enemies.Remove(ref e);
+        DespawnFromPoolSet(state.enemyPools, e.common.refs);
 
         // NOTE: Enemies may not necessarily come from spawners
         for (int i = 0; i < state.enemySpawns.Length; i++)
         {
             ref Spawn spawn = ref state.enemySpawns[i];
-            spawn.ships.Remove(enemy.common.refs);
+            spawn.ships.Remove(e.common.refs);
         }
     }
 
@@ -289,7 +288,7 @@ public class Entrypoint : MonoBehaviour
         state.projectilePool = CreatePoolSet(projectilePrefab, 128);
         state.projectiles = new List<Projectile>(128);
         state.debrisPools = CreatePoolSet(debrisPrefabs, 32);
-        state.enemyPools = CreatePoolSet(enemyPrefabs, 16);
+        state.enemyPools = CreatePoolSet(enemyPrefabs, 3);
         state.enemies = new RefList<EnemyShip>(32);
 
         state.enemySpawns = new Spawn[enemySpawns.Length];
