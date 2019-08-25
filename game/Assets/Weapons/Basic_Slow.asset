@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Basic_Slow
   m_EditorClassIdentifier: 
   refireDelay: 1
-  impulse: 25
+  impulse: 15
   lifetime: 3
   turnSpeed: 0.2

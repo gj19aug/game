@@ -102,8 +102,8 @@ MonoBehaviour:
   physicsTransform: {fileID: 490369626211553718}
   collider: {fileID: 7304720554541506485}
   sprite: {fileID: 3092062353052357953}
-  moveSpec: {fileID: 11400000, guid: 2dea4c77906e4004692ba859a0d2fcae, type: 2}
-  magnetismSpec: {fileID: 11400000, guid: b6ed92d16c3ecd142a61e6bc86e80f86, type: 2}
+  moveSpec: {fileID: 11400000, guid: 7c39e37b747775b4f80e29dd6dac42a3, type: 2}
+  magnetismSpec: {fileID: 11400000, guid: d77617e2d57a3d24383cd3409e4e9630, type: 2}
 --- !u!82 &-7605439848484887810
 AudioSource:
   m_ObjectHideFlags: 0
@@ -298,7 +298,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 0.63870966}
+    oldSize: {x: 0.63870966, y: 1}
     newSize: {x: 10.24, y: 10.24}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
