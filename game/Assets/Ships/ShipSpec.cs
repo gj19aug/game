@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Move Spec", menuName = "Move Spec")]
-public class MoveSpec : ScriptableObject
+[CreateAssetMenu(fileName = "New Ship Spec", menuName = "Ship Spec")]
+public class ShipSpec : ScriptableObject
 {
     //[Header("The effective movement formula is x1 = x0 + 0.5 (drag * dragCurve(vMul * v) * aMul * input) * t^2 + vt")]
 
@@ -23,4 +23,6 @@ public class MoveSpec : ScriptableObject
     [Tooltip("How fast the ship is capable of turning. Units are incomprehensible.")]
     [Range(0, 1)]
     public float turnSpeed = 0.1f;
+
+    public int maxHealth = 4;
 }

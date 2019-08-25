@@ -18,12 +18,16 @@ public struct GameState
 
     // Enemies
     public Pool<ShipRefs>[] enemyPools;
-    public List<EnemyShip> enemies;
+    public RefList<EnemyShip> enemies;
     public Spawn[] enemySpawns;
 
-    // Cache
+    // Caches
     public Collider2D[] colliderCache;
+    public RefList<Impact> impactCache;
 }
+
+[Serializable]
+public class Refs : MonoBehaviour {}
 
 [Serializable]
 public struct ShipCommon
@@ -32,6 +36,7 @@ public struct ShipCommon
     public MoveState move;
     public ShipInput input;
     public List<Weapon> weapons;
+    public int health;
 }
 
 [Serializable]
@@ -81,7 +86,17 @@ public struct Weapon
 public struct Projectile
 {
     public ProjectileRefs refs;
+    public WeaponSpec spec;
+    public ShipRefs owner;
     public float lifetime;
+}
+
+[Serializable]
+public struct Impact
+{
+    public WeaponSpec spec;
+    public ShipRefs owner;
+    public ShipRefs victim;
 }
 
 [Serializable]

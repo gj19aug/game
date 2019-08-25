@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class CameraRefs : MonoBehaviour
+public class CameraRefs : Refs
 {
     public new Transform transform;
     public new Camera camera;

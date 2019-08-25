@@ -102,7 +102,7 @@ MonoBehaviour:
   physicsTransform: {fileID: 490369626211553718}
   collider: {fileID: 7304720554541506485}
   sprite: {fileID: 3092062353052357953}
-  moveSpec: {fileID: 11400000, guid: 7c39e37b747775b4f80e29dd6dac42a3, type: 2}
+  shipSpec: {fileID: 11400000, guid: 7c39e37b747775b4f80e29dd6dac42a3, type: 2}
   magnetismSpec: {fileID: 11400000, guid: d77617e2d57a3d24383cd3409e4e9630, type: 2}
 --- !u!82 &-7605439848484887810
 AudioSource:

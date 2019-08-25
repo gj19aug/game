@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class WeaponRefs : MonoBehaviour
+public class WeaponRefs : Refs
 {
     public new Transform transform;
     // HACK: Yuck.
