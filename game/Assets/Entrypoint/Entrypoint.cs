@@ -149,9 +149,21 @@ public class Entrypoint : MonoBehaviour
             ship.health -= impact.spec.damage;
             if (ship.health <= 0)
             {
-                // TODO: Debris and effects
                 ref EnemyShip e = ref FindEnemy(ship.refs);
+                ShipSpec spec = e.common.refs.shipSpec;
+
                 DespawnEnemy(ref e);
+                float lerp = spec.debrisDistribution.Evaluate(Random.Range(0.0f, 1.0f));
+                float floatCount = Mathf.Lerp(spec.debrisDropped.min, spec.debrisDropped.max, lerp);
+                int count = Mathf.RoundToInt(floatCount);
+                for (int i = 0; i < count; i++)
+                {
+                    Vector3 dir = Random.insideUnitCircle;
+                    DebrisRefs debris = SpawnFromPoolSet(state.debrisPools);
+                    debris.rigidbody.position = e.common.move.p + (1.0f + spec.debrisRange) * dir;
+                    debris.rigidbody.rotation = 360.0f * Random.value;
+                    debris.rigidbody.AddForce(spec.debrisImpulse * Random.Range(0.5f, 1.5f) * dir, ForceMode2D.Impulse);
+                }
             }
         }
     }
@@ -287,7 +299,7 @@ public class Entrypoint : MonoBehaviour
         state.weaponPool = CreatePoolSet(weaponPrefab, 32);
         state.projectilePool = CreatePoolSet(projectilePrefab, 128);
         state.projectiles = new List<Projectile>(128);
-        state.debrisPools = CreatePoolSet(debrisPrefabs, 32);
+        state.debrisPools = CreatePoolSet(debrisPrefabs, 128);
         state.enemyPools = CreatePoolSet(enemyPrefabs, 3);
         state.enemies = new RefList<EnemyShip>(32);
 
@@ -308,6 +320,7 @@ public class Entrypoint : MonoBehaviour
         {
             state.player.common.refs = Instantiate(playerPrefab);
             state.player.common.weapons = new RefList<Weapon>(2);
+            state.player.debris = new List<DebrisRefs>(128);
             AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
             AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
         }

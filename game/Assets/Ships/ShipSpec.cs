@@ -25,4 +25,19 @@ public class ShipSpec : ScriptableObject
     public float turnSpeed = 0.1f;
 
     public int maxHealth = 4;
+
+    //[MinMaxRange(0, 50)]
+    public IntRange debrisDropped = new IntRange() { min = 0, max = 10};
+
+    public AnimationCurve debrisDistribution = new AnimationCurve(
+        new Keyframe(0.0f, 0.0f),
+        new Keyframe(0.5f, 1.0f),
+        new Keyframe(1.0f, 0.0f)
+    );
+
+    [Range(0.0f, 3.0f)]
+    public float debrisRange = 0.5f;
+
+    [Range(0.0f, 10.0f)]
+    public float debrisImpulse = 5.0f;
 }
