@@ -31,6 +31,27 @@ public static class TransformEx
         scale.z = mul * scale.z;
         transform.localScale = scale;
     }
+
+    public static void SetScaleX(this Transform transform, float x)
+    {
+        Vector3 scale = transform.localScale;
+        scale.x = x;
+        transform.localScale = scale;
+    }
+
+    public static void SetScaleY(this Transform transform, float y)
+    {
+        Vector3 scale = transform.localScale;
+        scale.y = y;
+        transform.localScale = scale;
+    }
+
+    public static void SetScaleZ(this Transform transform, float z)
+    {
+        Vector3 scale = transform.localScale;
+        scale.z = z;
+        transform.localScale = scale;
+    }
 }
 
 public static class Vector3Ex

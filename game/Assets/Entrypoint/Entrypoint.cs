@@ -33,11 +33,13 @@ public class Entrypoint : MonoBehaviour
         weapon.refs = SpawnFromPoolSet(state.weaponPool);
         weapon.refs.transform.parent = parent;
         weapon.refs.transform.localPosition = relPos;
+        weapon.refs.transform.localRotation = Quaternion.identity;
         weapon.spec = spec;
         // NOTE: Assume x is down
         float angle = Vector2.SignedAngle(relPos, Vector2.down);
         Assert.IsTrue(angle >= -180 && angle <= 180);
-        if (angle < 0) weapon.refs.transform.MulScaleX(-1.0f);
+        Assert.AreApproximatelyEqual(Mathf.Abs(weapon.refs.transform.localScale.x), 1.0f);
+        weapon.refs.transform.SetScaleX(Mathf.Sign(angle));
     }
 
     void RemoveWeapon(ref ShipCommon ship)
@@ -226,6 +228,13 @@ public class Entrypoint : MonoBehaviour
             RemoveWeapon(ref enemy.common);
         state.enemies.Remove(ref enemy);
         DespawnFromPoolSet(state.enemyPools, enemy.common.refs);
+
+        // NOTE: Enemies may not necessarily come from spawners
+        for (int i = 0; i < state.enemySpawns.Length; i++)
+        {
+            ref Spawn spawn = ref state.enemySpawns[i];
+            spawn.ships.Remove(enemy.common.refs);
+        }
     }
 
     bool ShipExists(ShipRefs refs)
@@ -510,7 +519,7 @@ public class Entrypoint : MonoBehaviour
                 {
                     if (t >= spawn.nextSpawnTime)
                     {
-                        // BUG: Floating point issues for large time
+                        // BUG: Floating point issues for large t
                         spawn.nextSpawnTime += spec.timeBetweenSpawns;
                         Vector3 pos = spawn.refs.transform.position + (Vector3) (5.0f * Random.insideUnitCircle);
                         ref EnemyShip e = ref SpawnEnemy(pos);
