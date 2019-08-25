@@ -35,7 +35,7 @@ public struct ShipCommon
     public ShipRefs refs;
     public MoveState move;
     public ShipInput input;
-    public List<Weapon> weapons;
+    public RefList<Weapon> weapons;
     public int health;
 }
 

@@ -29,7 +29,7 @@ public class Entrypoint : MonoBehaviour
     {
         Transform parent = ship.refs.physicsTransform;
 
-        var weapon = new Weapon();
+        ref Weapon weapon = ref ship.weapons.Add();
         weapon.refs = SpawnFromPoolSet(state.weaponPool);
         weapon.refs.transform.parent = parent;
         weapon.refs.transform.localPosition = relPos;
@@ -38,7 +38,18 @@ public class Entrypoint : MonoBehaviour
         float angle = Vector2.SignedAngle(relPos, Vector2.down);
         Assert.IsTrue(angle >= -180 && angle <= 180);
         if (angle < 0) weapon.refs.transform.MulScaleX(-1.0f);
-        ship.weapons.Add(weapon);
+    }
+
+    void RemoveWeapon(ref ShipCommon ship)
+    {
+        for (int i = 0; i < ship.weapons.Count; i++)
+        {
+            ref Weapon w = ref ship.weapons[i];
+            DespawnFromPoolSet(state.weaponPool, w.refs);
+            // HACK:
+            w.refs.transform.parent = state.weaponPool.root;
+        }
+        ship.weapons.Clear();
     }
 
     static void ProcessShipMovement(ref ShipCommon ship)
@@ -83,7 +94,7 @@ public class Entrypoint : MonoBehaviour
 
         for (int j = 0; j < ship.weapons.Count; j++)
         {
-            Weapon weapon = ship.weapons[j];
+            ref Weapon weapon = ref ship.weapons[j];
             WeaponRefs refs = weapon.refs;
             WeaponSpec spec = weapon.spec;
 
@@ -109,8 +120,6 @@ public class Entrypoint : MonoBehaviour
                 p.lifetime = spec.lifetime;
                 state.projectiles.Add(p);
             }
-
-            ship.weapons[j] = weapon;
         }
 
         // HACK: Unity input is a pile of radioactive garbage
@@ -121,12 +130,26 @@ public class Entrypoint : MonoBehaviour
         input.aim = prevInput.aim;
     }
 
+    bool IsPlayerShip(ref ShipCommon ship)
+    {
+        ref ShipCommon player = ref state.player.common;
+        return EqualityComparer<ShipCommon>.Default.Equals(player, ship);
+    }
+
     void ProcessShipImpact(ref ShipCommon ship, ref Impact impact)
     {
-        ship.health -= impact.spec.damage;
-        if (ship.health <= 0)
+        if (IsPlayerShip(ref ship))
         {
-            Debug.Log("Dead!");
+            // TODO: Implement
+        }
+        else
+        {
+            ship.health -= impact.spec.damage;
+            if (ship.health <= 0)
+            {
+                // TODO: Debris and effects
+                DespawnEnemy(ref FindEnemy(ship.refs));
+            }
         }
     }
 
@@ -141,6 +164,11 @@ public class Entrypoint : MonoBehaviour
     {
         T instance = pool.Spawn();
         return instance;
+    }
+
+    void DespawnFromPoolSet<T>(Pool<T> pool, T instance) where T : MonoBehaviour
+    {
+        pool.Despawn(instance);
     }
 
     Pool<T>[] CreatePoolSet<T>(T[] prefabs, int poolCount) where T : MonoBehaviour
@@ -163,11 +191,25 @@ public class Entrypoint : MonoBehaviour
         return instance;
     }
 
+    void DespawnFromPoolSet<T>(Pool<T>[] pools, T instance) where T : MonoBehaviour
+    {
+        for (int i = 0; i < pools.Length; i++)
+        {
+            Pool<T> pool = pools[i];
+            if (pool.Contains(instance))
+            {
+                pool.Despawn(instance);
+                return;
+            }
+        }
+        Assert.IsTrue(false);
+    }
+
     ref EnemyShip SpawnEnemy(Vector3 position)
     {
         ref EnemyShip e = ref state.enemies.Add();
         e.common.refs = SpawnFromPoolSet(state.enemyPools);
-        e.common.weapons = new List<Weapon>(2);
+        e.common.weapons = new RefList<Weapon>(2);
         e.common.health = e.common.refs.shipSpec.maxHealth;
         e.common.move.p = position;
 
@@ -178,7 +220,28 @@ public class Entrypoint : MonoBehaviour
         return ref e;
     }
 
-    //void DespawnEnemy() {}
+    void DespawnEnemy(ref EnemyShip enemy)
+    {
+        for (int i = 0; i < enemy.common.weapons.Count; i++)
+            RemoveWeapon(ref enemy.common);
+        state.enemies.Remove(ref enemy);
+        DespawnFromPoolSet(state.enemyPools, enemy.common.refs);
+    }
+
+    bool ShipExists(ShipRefs refs)
+    {
+        for (int i = 0; i < state.enemies.Count; i++)
+        {
+            ref EnemyShip e = ref state.enemies[i];
+            if (e.common.refs == refs)
+                return true;
+        }
+
+        if (state.player.common.refs == refs)
+            return true;
+
+        return false;
+    }
 
     ref ShipCommon FindShip(ShipRefs refs)
     {
@@ -194,6 +257,19 @@ public class Entrypoint : MonoBehaviour
 
         Assert.IsTrue(false);
         return ref state.enemies[0].common;
+    }
+
+    ref EnemyShip FindEnemy(ShipRefs refs)
+    {
+        for (int i = 0; i < state.enemies.Count; i++)
+        {
+            ref EnemyShip e = ref state.enemies[i];
+            if (e.common.refs == refs)
+                return ref e;
+        }
+
+        Assert.IsTrue(false);
+        return ref state.enemies[0];
     }
 
     void Awake()
@@ -223,7 +299,7 @@ public class Entrypoint : MonoBehaviour
         // Spawn player
         {
             state.player.common.refs = Instantiate(playerPrefab);
-            state.player.common.weapons = new List<Weapon>(2);
+            state.player.common.weapons = new RefList<Weapon>(2);
             AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
             AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
         }
@@ -289,6 +365,7 @@ public class Entrypoint : MonoBehaviour
             state.projectilePool.Despawn(p.refs);
             state.projectiles.RemoveAt(i);
 
+            // TODO: I wonder if this indirection is a bad idea?
             // Register Impact
             for (int j = 0; j < count; j++)
             {
@@ -310,6 +387,8 @@ public class Entrypoint : MonoBehaviour
             ref Impact impact = ref state.impactCache[i];
             if (impact.victim)
             {
+                // HACK: Ugh.
+                if (!ShipExists(impact.victim)) continue;
                 ref ShipCommon s = ref FindShip(impact.victim);
                 ProcessShipImpact(ref s, ref impact);
             }
@@ -390,6 +469,7 @@ public class Entrypoint : MonoBehaviour
                 // TODO: Horribly inefficient
                 for (int j = 0; j < state.debrisPools.Length; j++)
                 {
+                    // TODO: Should this actually remove from the pool? (They'll get returned later anyway.)
                     if (state.debrisPools[j].Remove(dr))
                         break;
                 }
@@ -455,7 +535,7 @@ public class Entrypoint : MonoBehaviour
             Gizmos.color = Color.green;
             for (int i = 0; i < ship.weapons.Count; i++)
             {
-                Weapon weapon = ship.weapons[i];
+                ref Weapon weapon = ref ship.weapons[i];
                 Vector3 pos = weapon.refs.fireTransform.position;
                 Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
                 Gizmos.DrawLine(pos, pos + aim);
