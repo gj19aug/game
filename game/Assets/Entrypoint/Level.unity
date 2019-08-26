@@ -453,6 +453,8 @@ MonoBehaviour:
   - {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1, type: 3}
   impactPrefab: {fileID: 6427970028925150938, guid: db9fcde46778fa54590ea53fb96cd4fc,
     type: 3}
+  explosionPrefab: {fileID: 1099061329349664048, guid: a4a9ad99ca01ed0448e6951e2401f745,
+    type: 3}
 --- !u!4 &243272047
 Transform:
   m_ObjectHideFlags: 0
