@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2576352939414045836}
   - component: {fileID: 1099061329349664048}
   m_Layer: 0
-  m_Name: ShipExplosionVFX
+  m_Name: Ship_Explosion_Effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

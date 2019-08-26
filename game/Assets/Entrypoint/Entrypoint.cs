@@ -159,7 +159,7 @@ public class Entrypoint : MonoBehaviour
                 effect.refs = state.explosionPool.Spawn();
                 effect.refs.transform.position = impact.position;
                 effect.refs.transform.rotation = Quaternion.identity;
-                effect.lifetime = 2.0f;
+                effect.lifetime = 0.7f;
 
                 DespawnEnemy(ref e);
                 float lerp = spec.debrisDistribution.Evaluate(Random.Range(0.0f, 1.0f));
@@ -460,7 +460,7 @@ public class Entrypoint : MonoBehaviour
                 effect.refs = state.impactPool.Spawn();
                 effect.refs.transform.position = impact.position;
                 effect.refs.transform.rotation = Quaternion.identity;
-                effect.lifetime = 1.0f;
+                effect.lifetime = .7f;
             }
         }
         state.impactCache.Clear();
