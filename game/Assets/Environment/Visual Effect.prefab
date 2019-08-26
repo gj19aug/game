@@ -46,16 +46,16 @@ VisualEffect:
   m_PropertySheet:
     m_Float:
       m_Array:
-      - m_Value: 60.17
+      - m_Value: 10
         m_Name: Intensity
         m_Overridden: 1
       - m_Value: 16.38
         m_Name: Noise_drag
         m_Overridden: 1
-      - m_Value: 0.057
+      - m_Value: 0.05
         m_Name: Speed_max
         m_Overridden: 1
-      - m_Value: 0.975
+      - m_Value: 1.57
         m_Name: Speed_min
         m_Overridden: 1
     m_Vector2f:

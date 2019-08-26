@@ -20,8 +20,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 431
     y: -269
-    width: 743
-    height: 1525
+    width: 1139
+    height: 1527
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -287,7 +287,7 @@ VisualEffectResource:
       scaleX = (float)1;\n\t\t\t\t\t\tfloat scaleY = (float)1;\n\t\t\t\t\t\tfloat
       scaleZ = (float)1;\n\t\t\t\t\t\tfloat age = asfloat(attributeBuffer.Load((index
       * 0x8 + 0x7) << 2));\n\t\t\t\t\t\t\n\t\t\t\t\n\t\t\t\t\t\t#endif\n\t\t\t\t\t\t\n\t\t\t\t{\n\t\t\t\t
-      \   SetAttribute_3278B22F( /*inout */size, (float)0.03);\n\t\t\t\t}\n\t\t\t\tOrient_6(
+      \   SetAttribute_3278B22F( /*inout */size, (float)0.035);\n\t\t\t\t}\n\t\t\t\tOrient_6(
       /*inout */axisX,  /*inout */axisY,  /*inout */axisZ, position, velocity);\n\t\t\t\tAttributeFromCurve_6F8995BE(
       /*inout */scaleY, age, lifetime, Scale_c);\n\t\t\t\t\n\n\t\t\t\t\n\t\t\t\tif
       (!alive)\n\t\t\t\t\treturn o;\n\t\t\t\t\n\t\t\t#if VFX_PRIMITIVE_QUAD\n\t\t\t\n\t\t\t\to.VFX_VARYING_UV.x
@@ -547,7 +547,7 @@ VisualEffectResource:
         - m_ExpressionIndex: 15
           m_Value: 0
         - m_ExpressionIndex: 20
-          m_Value: 0.03
+          m_Value: 0.035
         - m_ExpressionIndex: 21
           m_Value: 12
         - m_ExpressionIndex: 25
@@ -1028,7 +1028,7 @@ MonoBehaviour:
   m_Children:
   - {fileID: 8926484042661614763}
   - {fileID: 8926484042661614772}
-  m_UIPosition: {x: 798.307, y: -43.64624}
+  m_UIPosition: {x: 1194, y: -77}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -1061,7 +1061,7 @@ MonoBehaviour:
   - {fileID: 8926484042661614754}
   - {fileID: 8926484042661614758}
   m_UIPosition: {x: 0, y: 0}
-  m_UICollapsed: 1
+  m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_MasterSlot: {fileID: 8926484042661614753}
   m_MasterData:
@@ -2706,7 +2706,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.03
+      m_SerializableObject: 0.035
     m_Space: 2147483647
   m_Property:
     name: Size
