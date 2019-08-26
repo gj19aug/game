@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -451,8 +451,8 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: -2299728369730618024, guid: 168d83b77a0742d468562c467aec61a4, type: 3}
   - {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1, type: 3}
-  impactPrefabs:
-  - {fileID: 7581091287619798918, guid: db9fcde46778fa54590ea53fb96cd4fc, type: 3}
+  impactPrefab: {fileID: 6427970028925150938, guid: db9fcde46778fa54590ea53fb96cd4fc,
+    type: 3}
 --- !u!4 &243272047
 Transform:
   m_ObjectHideFlags: 0

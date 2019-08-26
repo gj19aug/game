@@ -12,9 +12,10 @@ public struct GameState
     public Pool<WeaponRefs> weaponPool;
     public Pool<ProjectileRefs> projectilePool;
     public List<Projectile> projectiles;
+    public Pool<ImpactRefs> impactPool;
 
     // Visual FX
-    public RefList<ImpactEffect> impactEffect;
+    public RefList<ImpactEffect> impactEffects;
 
     // Debris
     public Pool<DebrisRefs>[] debrisPools;
@@ -106,7 +107,7 @@ public struct Impact
 [Serializable]
 public struct ImpactEffect
 {
-    public GameObject gameObject;
+    public ImpactRefs refs;
     public float lifetime;
 }
 

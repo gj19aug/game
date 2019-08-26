@@ -16,7 +16,7 @@ public class Entrypoint : MonoBehaviour
     public SpawnRefs[] enemySpawns;
     public DebrisRefs[] debrisPrefabs;
     public ShipRefs[] enemyPrefabs;
-    public GameObject[] impactPrefabs;
+    public ImpactRefs impactPrefab;
 
     // Game State
     private GameState state;
@@ -303,7 +303,8 @@ public class Entrypoint : MonoBehaviour
         state.debrisPools = CreatePoolSet(debrisPrefabs, 256);
         state.enemyPools = CreatePoolSet(enemyPrefabs, 32);
         state.enemies = new RefList<EnemyShip>(64);
-        state.impactEffect = new RefList<ImpactEffect>(128);
+        state.impactPool = CreatePoolSet(impactPrefab, 128);
+        state.impactEffects = new RefList<ImpactEffect>(128);
 
         state.enemySpawns = new Spawn[enemySpawns.Length];
         for (int i = 0; i < enemySpawns.Length; i++)
@@ -405,12 +406,15 @@ public class Entrypoint : MonoBehaviour
             }
         }
 
-        for (int i = state.impactEffect.Count - 1; i >= 0; i--)
+        for (int i = state.impactEffects.Count - 1; i >= 0; i--)
         {
-            state.impactEffect[i].lifetime -= dt;
-            if (state.impactEffect[i].lifetime <= 0.0f)
+            ref ImpactEffect effect = ref state.impactEffects[i];
+
+            effect.lifetime -= dt;
+            if (effect.lifetime <= 0.0f)
             {
-                Destroy(state.impactEffect[i].gameObject);
+                state.impactPool.Despawn(effect.refs);
+                state.impactEffects.RemoveAt(i);
             }
         }
 
@@ -421,16 +425,18 @@ public class Entrypoint : MonoBehaviour
             if (impact.victim)
             {
                 // HACK: Ugh.
-                if (!ShipExists(impact.victim)) continue;
-                ref ShipCommon s = ref FindShip(impact.victim);
-                ProcessShipImpact(ref s, ref impact);
+                if (ShipExists(impact.victim))
+                {
+                    ref ShipCommon s = ref FindShip(impact.victim);
+                    ProcessShipImpact(ref s, ref impact);
+                }
 
                 // VFX
-                ImpactEffect hitFx = new ImpactEffect();
-                hitFx.gameObject = Instantiate(impactPrefabs[0], impact.position, Quaternion.identity);
-
-                hitFx.lifetime = 1.0f;
-                state.impactEffect.Add(hitFx);
+                ref ImpactEffect effect = ref state.impactEffects.Add();
+                effect.refs = state.impactPool.Spawn();
+                effect.refs.transform.position = impact.position;
+                effect.refs.transform.rotation = Quaternion.identity;
+                effect.lifetime = 1.0f;
             }
         }
         state.impactCache.Clear();
