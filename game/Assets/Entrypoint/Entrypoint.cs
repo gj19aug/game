@@ -300,10 +300,10 @@ public class Entrypoint : MonoBehaviour
         state.weaponPool = CreatePoolSet(weaponPrefab, 32);
         state.projectilePool = CreatePoolSet(projectilePrefab, 128);
         state.projectiles = new List<Projectile>(128);
-        state.debrisPools = CreatePoolSet(debrisPrefabs, 128);
-        state.enemyPools = CreatePoolSet(enemyPrefabs, 3);
-        state.enemies = new RefList<EnemyShip>(32);
-        state.impactEffect = new RefList<ImpactEffect>(3);
+        state.debrisPools = CreatePoolSet(debrisPrefabs, 256);
+        state.enemyPools = CreatePoolSet(enemyPrefabs, 32);
+        state.enemies = new RefList<EnemyShip>(64);
+        state.impactEffect = new RefList<ImpactEffect>(128);
 
         state.enemySpawns = new Spawn[enemySpawns.Length];
         for (int i = 0; i < enemySpawns.Length; i++)
@@ -428,7 +428,7 @@ public class Entrypoint : MonoBehaviour
                 // VFX
                 ImpactEffect hitFx = new ImpactEffect();
                 hitFx.gameObject = Instantiate(impactPrefabs[0], impact.position, Quaternion.identity);
-                
+
                 hitFx.lifetime = 1.0f;
                 state.impactEffect.Add(hitFx);
             }

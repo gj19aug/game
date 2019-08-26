@@ -43,7 +43,11 @@ public class Pool<T> where T : MonoBehaviour
     {
         if (pool.Count == 0)
         {
-            CreateInstance(prefab);
+            // NOTE: Double the size of the pool
+            int newCapacity = active.Count + pool.Count;
+            for (int i = 0; i < newCapacity; i++)
+                CreateInstance(prefab);
+
             if (!warned)
             {
                 warned = true;
