@@ -504,7 +504,7 @@ public class Entrypoint : MonoBehaviour
         // Camera
         // TODO: Should the camera have a rigidbody for movement interpolation?
         camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
-        camera.camera.orthographicSize = 5.0f + (player.common.refs.physicsTransform.childCount * 0.03f);
+        camera.camera.orthographicSize = 7.0f + (player.common.refs.physicsTransform.childCount * 0.01f);
 
         // TODO: Horribly inefficient
         // Projectiles

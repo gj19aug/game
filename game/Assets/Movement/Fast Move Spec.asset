@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78a5a8a230c5632408a46088ba384fb1, type: 3}
   m_Name: Fast Move Spec
   m_EditorClassIdentifier: 
-  acceleration: 35
+  acceleration: 25
   drag: 3
   dragCurve:
     serializedVersion: 2
@@ -42,7 +42,7 @@ MonoBehaviour:
   turnSpeed: 0.1
   maxHealth: 4
   debrisDropped:
-    min: 2
+    min: 0
     max: 10
   debrisDistribution:
     serializedVersion: 2
@@ -77,3 +77,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  debrisRange: 0.5
+  debrisImpulse: 5

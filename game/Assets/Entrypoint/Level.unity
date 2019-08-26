@@ -308,7 +308,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &48159491
 MonoBehaviour:
@@ -2068,7 +2068,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!1 &509360423
 GameObject:
@@ -2279,7 +2279,7 @@ Transform:
   m_Children:
   - {fileID: 563654876}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &525212578
 GameObject:
@@ -2928,7 +2928,7 @@ Transform:
   - {fileID: 693502077}
   - {fileID: 1087833189}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &619616770
 GameObject:
@@ -3019,7 +3019,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &629709761
 GameObject:
@@ -3396,6 +3396,75 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 641996301}
   m_CullTransparentMesh: 0
+--- !u!1001 &649338585
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1305626058860816638, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_Name
+      value: Asteroid Belt
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 32.521988
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 32.83317
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1305626058860816639, guid: 45421ab299b944d4ebace504efbd474f,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 45421ab299b944d4ebace504efbd474f, type: 3}
 --- !u!1 &663903766
 GameObject:
   m_ObjectHideFlags: 0
@@ -5874,7 +5943,8 @@ AudioSource:
   m_GameObject: {fileID: 2071920559}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 8937943535080393646, guid: 5b7d291a634dd6c468e10c0da7826292,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: 530c5220b3caa944b923be4528125750, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.3

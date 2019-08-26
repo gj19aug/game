@@ -102,8 +102,8 @@ MonoBehaviour:
   physicsTransform: {fileID: 490369626211553718}
   collider: {fileID: 7304720554541506485}
   sprite: {fileID: 3092062353052357953}
-  shipSpec: {fileID: 11400000, guid: 7c39e37b747775b4f80e29dd6dac42a3, type: 2}
-  magnetismSpec: {fileID: 11400000, guid: d77617e2d57a3d24383cd3409e4e9630, type: 2}
+  shipSpec: {fileID: 11400000, guid: 87876dc39855ef94bad05fc6c8b6d819, type: 2}
+  magnetismSpec: {fileID: 11400000, guid: 730a610f27c1bb748953978155fd7064, type: 2}
 --- !u!82 &-7605439848484887810
 AudioSource:
   m_ObjectHideFlags: 0
@@ -113,11 +113,12 @@ AudioSource:
   m_GameObject: {fileID: 3092062353021630548}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 9471ad2bd3b0b124abe33335fa6332d4, type: 3}
+  OutputAudioMixerGroup: {fileID: 3486072950640127867, guid: 5b7d291a634dd6c468e10c0da7826292,
+    type: 2}
+  m_audioClip: {fileID: 8300000, guid: 2d265bff52068324cb7832b3d89c4062, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
-  m_Pitch: 0.6
+  m_Pitch: 0.5
   Loop: 1
   Mute: 0
   Spatialize: 0
