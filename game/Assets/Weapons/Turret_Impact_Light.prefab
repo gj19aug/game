@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1057172189395404872}
   - component: {fileID: 841567594947330124}
   m_Layer: 0
-  m_Name: HitLight
+  m_Name: Turret_Impact_Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
