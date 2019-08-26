@@ -8,7 +8,7 @@ public class AsteroidBirth : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        rb.AddTorque(Random.Range(2.0f, 6.0f), ForceMode2D.Force); 
+        rb.AddTorque(Random.Range(300.0f, 500.0f), ForceMode2D.Force); 
     }
 
     // Update is called once per frame
