@@ -468,6 +468,10 @@ public class Entrypoint : MonoBehaviour
                 effect.refs.transform.position = impact.position;
                 effect.refs.transform.rotation = Random.rotation;
                 effect.lifetime = 0.7f;
+
+                // Cam shake test
+                Vector3 camPos = camera.transform.localPosition;
+                camera.transform.localPosition = camPos + Random.insideUnitSphere * 0.15f;
             }
         }
         state.impactCache.Clear();
