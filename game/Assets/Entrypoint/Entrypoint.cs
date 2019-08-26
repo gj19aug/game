@@ -91,7 +91,7 @@ public class Entrypoint : MonoBehaviour
         return direction;
     }
 
-    void ProcessShipWeapons(ref ShipCommon ship)
+    void ProcessShipWeapons(ref ShipCommon ship, bool isPlayer)
     {
         float t = Time.fixedTime;
         ref ShipInput input = ref ship.input;
@@ -103,6 +103,10 @@ public class Entrypoint : MonoBehaviour
             WeaponSpec spec = weapon.spec;
 
             Vector3 desiredAim = input.point - refs.fireTransform.position;
+            #if false
+            float dot = Vector3.Dot(ship.move.dp, desiredAim);
+            desiredAim = desiredAim + Mathf.Max(0.0f, dot) * ship.move.dp;
+            #endif
             weapon.aim = Vector3.Slerp(weapon.aim, desiredAim, spec.turnSpeed);
 
             if (input.shoot && t >= weapon.nextRefireTime)
@@ -112,7 +116,10 @@ public class Entrypoint : MonoBehaviour
                 Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
 
                 ProjectileRefs pr = SpawnFromPoolSet(state.projectilePool);
-                pr.rigidbody.tag = Tag.Player;
+                int layer = isPlayer ? Layers.PlayerProjectile : Layers.EnemyProjectile;
+                pr.rigidbody.gameObject.layer = layer;
+                pr.collider.gameObject.layer = layer;
+
                 pr.rigidbody.position = refs.fireTransform.position;
                 pr.rigidbody.rotation = Vector2.SignedAngle(Vector2.up, aim);
                 pr.rigidbody.AddForce(spec.impulse * aim, ForceMode2D.Impulse);
@@ -459,15 +466,15 @@ public class Entrypoint : MonoBehaviour
                 ref ImpactEffect effect = ref state.impactEffects.Add();
                 effect.refs = state.impactPool.Spawn();
                 effect.refs.transform.position = impact.position;
-                effect.refs.transform.rotation = Quaternion.identity;
-                effect.lifetime = .7f;
+                effect.refs.transform.rotation = Random.rotation;
+                effect.lifetime = 0.7f;
             }
         }
         state.impactCache.Clear();
 
         ref PlayerShip player = ref state.player;
         ProcessShipMovement(ref player.common);
-        ProcessShipWeapons(ref player.common);
+        ProcessShipWeapons(ref player.common, true);
 
         for (int i = 0; i < state.enemies.Count; i++)
         {
@@ -491,7 +498,7 @@ public class Entrypoint : MonoBehaviour
             input.shoot = Vector2.Angle(move.look, input.aim) < 22;
 
             ProcessShipMovement(ref enemy.common);
-            ProcessShipWeapons(ref enemy.common);
+            ProcessShipWeapons(ref enemy.common, false);
         }
 
         // Camera
@@ -533,13 +540,14 @@ public class Entrypoint : MonoBehaviour
                 player.debris.Add(dr);
 
                 // TODO: Having to destroy instead of disable is pretty lame.
+                dr.rigidbody.gameObject.layer = Layers.Player;
+                dr.collider.gameObject.layer = Layers.Player;
                 DestroyImmediate(dr.rigidbody);
                 dr.rigidbody = null;
 
                 // TODO: Horribly inefficient
                 for (int j = 0; j < state.debrisPools.Length; j++)
                 {
-                    // TODO: Should this actually remove from the pool? (They'll get returned later anyway.)
                     if (state.debrisPools[j].Remove(dr))
                         break;
                 }
@@ -555,9 +563,8 @@ public class Entrypoint : MonoBehaviour
             for (int i = 0; i < nearCount; i++)
             {
                 Rigidbody2D rb = state.colliderCache[i].attachedRigidbody;
-                if (rb.CompareTag(Tag.Player)) continue;
-
                 Vector3 relPos = (Vector3) rb.position - move.p;
+
                 float dist = relPos.magnitude;
 
                 // NOTE: Object is inside the player. Skip it and let physics depenetrate it.

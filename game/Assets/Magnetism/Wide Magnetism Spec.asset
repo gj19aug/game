@@ -41,4 +41,4 @@ MonoBehaviour:
   packing: 0.4
   affectedLayers:
     serializedVersion: 2
-    m_Bits: 1536
+    m_Bits: 1024

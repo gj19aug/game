@@ -128,9 +128,11 @@ public struct Spawn
     public List<ShipRefs> ships;
 }
 
-public static class Tag
+public static class Layers
 {
-    public static string Null = null;
-    public static string Player = "Player";
-    public static string Enemy = "Enemy";
+    public static int Player = LayerMask.NameToLayer("Player");
+    public static int Enemy = LayerMask.NameToLayer("Enemy");
+    public static int Debris = LayerMask.NameToLayer("Debris");
+    public static int PlayerProjectile = LayerMask.NameToLayer("Player Projectile");
+    public static int EnemyProjectile = LayerMask.NameToLayer("Enemy Projectile");
 }
