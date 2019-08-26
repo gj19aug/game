@@ -17,6 +17,7 @@ public class Entrypoint : MonoBehaviour
     public DebrisRefs[] debrisPrefabs;
     public ShipRefs[] enemyPrefabs;
     public ImpactRefs impactPrefab;
+    public ExplosionRefs explosionPrefab;
 
     // Game State
     private GameState state;

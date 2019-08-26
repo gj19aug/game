@@ -13,9 +13,11 @@ public struct GameState
     public Pool<ProjectileRefs> projectilePool;
     public List<Projectile> projectiles;
     public Pool<ImpactRefs> impactPool;
+    public Pool<ExplosionRefs> explosionPool;
 
     // Visual FX
     public RefList<ImpactEffect> impactEffects;
+    public RefList<ExplosionEffect> explosionEffects;
 
     // Debris
     public Pool<DebrisRefs>[] debrisPools;
@@ -111,6 +113,12 @@ public struct ImpactEffect
     public float lifetime;
 }
 
+[Serializable]
+public struct ExplosionEffect
+{
+    public ExplosionRefs refs;
+    public float lifetime;
+}
 
 [Serializable]
 public struct Spawn
