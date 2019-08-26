@@ -154,6 +154,13 @@ public class Entrypoint : MonoBehaviour
                 ref EnemyShip e = ref FindEnemy(ship.refs);
                 ShipSpec spec = e.common.refs.shipSpec;
 
+                // Explosion VFX
+                ref ExplosionEffect effect = ref state.explosionEffects.Add();
+                effect.refs = state.explosionPool.Spawn();
+                effect.refs.transform.position = impact.position;
+                effect.refs.transform.rotation = Quaternion.identity;
+                effect.lifetime = 2.0f;
+
                 DespawnEnemy(ref e);
                 float lerp = spec.debrisDistribution.Evaluate(Random.Range(0.0f, 1.0f));
                 float floatCount = Mathf.Lerp(spec.debrisDropped.min, spec.debrisDropped.max, lerp);
@@ -306,6 +313,8 @@ public class Entrypoint : MonoBehaviour
         state.enemies = new RefList<EnemyShip>(64);
         state.impactPool = CreatePoolSet(impactPrefab, 128);
         state.impactEffects = new RefList<ImpactEffect>(128);
+        state.explosionPool = CreatePoolSet(explosionPrefab, 128);
+        state.explosionEffects = new RefList<ExplosionEffect>(128);
 
         state.enemySpawns = new Spawn[enemySpawns.Length];
         for (int i = 0; i < enemySpawns.Length; i++)
@@ -407,6 +416,20 @@ public class Entrypoint : MonoBehaviour
             }
         }
 
+        // Check to see if ship explosion needs to be despawned
+        for (int i = state.explosionEffects.Count - 1; i >= 0; i--)
+        {
+            ref ExplosionEffect effect = ref state.explosionEffects[i];
+
+            effect.lifetime -= dt;
+            if (effect.lifetime <= 0.0f)
+            {
+                state.explosionPool.Despawn(effect.refs);
+                state.explosionEffects.RemoveAt(i);
+            }
+        }
+
+        // Check to see if hit effect needs to be despawned
         for (int i = state.impactEffects.Count - 1; i >= 0; i--)
         {
             ref ImpactEffect effect = ref state.impactEffects[i];
