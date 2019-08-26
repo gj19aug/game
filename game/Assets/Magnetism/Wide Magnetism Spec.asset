@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Wide Magnetism Spec
   m_EditorClassIdentifier: 
   radius: 10
-  strength: 7
+  strength: 25
   strengthCurve:
     serializedVersion: 2
     m_Curve:
