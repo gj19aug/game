@@ -429,14 +429,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 519420030}
-  playerPrefab: {fileID: 3092062353021630551, guid: 323f8a00dfee74f4e9e95dbdafdf92d0,
-    type: 3}
-  weaponPrefab: {fileID: 6795343969222469785, guid: 3999d4b6a3b126b40b9063f44b5c4a80,
-    type: 3}
-  playerWeaponSpec: {fileID: 11400000, guid: 6c6d17c0861392e428314822f0a610ed, type: 2}
-  enemyWeaponSpec: {fileID: 11400000, guid: 29e1fd8c927f8064faeaaa346a31cf95, type: 2}
-  projectilePrefab: {fileID: 4004167460313986225, guid: 76552e3c3a9fa1d4e96406d8aa608e24,
-    type: 3}
   enemySpawns:
   - {fileID: 48159491}
   debrisPrefabs:
@@ -448,6 +440,13 @@ MonoBehaviour:
   - {fileID: 1000334977671597256, guid: aeb9b8c63a9db8f428469347acb3c652, type: 3}
   - {fileID: 6004172882933746613, guid: 0879264b89b870c4f822cefc5e688888, type: 3}
   - {fileID: 8993612040472856364, guid: 465b6c3f6c0b9e041917f4979078f72a, type: 3}
+  playerSpec: {fileID: 11400000, guid: 7c39e37b747775b4f80e29dd6dac42a3, type: 2}
+  weaponPrefab: {fileID: 6795343969222469785, guid: 3999d4b6a3b126b40b9063f44b5c4a80,
+    type: 3}
+  playerWeaponSpec: {fileID: 11400000, guid: 6c6d17c0861392e428314822f0a610ed, type: 2}
+  enemyWeaponSpec: {fileID: 11400000, guid: 29e1fd8c927f8064faeaaa346a31cf95, type: 2}
+  projectilePrefab: {fileID: 4004167460313986225, guid: 76552e3c3a9fa1d4e96406d8aa608e24,
+    type: 3}
   enemyPrefabs:
   - {fileID: -2299728369730618024, guid: 168d83b77a0742d468562c467aec61a4, type: 3}
   - {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1, type: 3}

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ImpactRefs : MonoBehaviour
+public class ImpactRefs : Refs
 {
     public new Transform transform;
     public ParticleSystem[] particles;

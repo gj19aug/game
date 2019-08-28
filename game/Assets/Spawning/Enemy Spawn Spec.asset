@@ -14,3 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxCount: 5
   timeBetweenSpawns: 0.4
+  ships:
+  - probability: 1
+    spec: {fileID: 11400000, guid: c26b0daa982e41940be3098c1c0d84d5, type: 2}
+  - probability: 1
+    spec: {fileID: 11400000, guid: 87876dc39855ef94bad05fc6c8b6d819, type: 2}

@@ -2,10 +2,10 @@
 
 public static class RandomEx
 {
-    public static T Element<T>(T[] array)
+    public static ref T Element<T>(T[] array)
     {
         int index = Random.Range(0, array.Length);
-        return array[index];
+        return ref array[index];
     }
 }
 

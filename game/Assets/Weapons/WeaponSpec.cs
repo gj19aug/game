@@ -3,6 +3,10 @@
 [CreateAssetMenu(fileName = "New Weapon Spec", menuName = "Weapon Spec")]
 public class WeaponSpec : ScriptableObject
 {
+    public WeaponRefs weaponPrefab;
+    public ProjectileRefs projectilePrefab;
+    public ImpactRefs impactPrefab;
+
     [Range(0.0f, 10.0f)]
     public float refireDelay = 0.1f;
 

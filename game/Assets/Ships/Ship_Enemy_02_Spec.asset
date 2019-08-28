@@ -10,35 +10,42 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78a5a8a230c5632408a46088ba384fb1, type: 3}
-  m_Name: Player Movement
+  m_Name: Ship_Enemy_02_Spec
   m_EditorClassIdentifier: 
-  acceleration: 25
+  shipPrefab: {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1,
+    type: 3}
+  explosionPrefab: {fileID: 1099061329349664048, guid: a4a9ad99ca01ed0448e6951e2401f745,
+    type: 3}
+  weaponSpec: {fileID: 11400000, guid: 1c74de9643ef9324c820a8fe2d577dcb, type: 2}
+  magnetismSpec: {fileID: 11400000, guid: c890f98be33c0094bbbf192b47e10319, type: 2}
+  aiSpec: {fileID: 0}
+  acceleration: 4
   drag: 3
   dragCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.2
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      time: 0.5541687
+      value: 0.98349
+      inSlope: 1
+      outSlope: 1
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  velocityMultiplierForDrag: 0.2
+  velocityMultiplierForDrag: 0.03
   turnSpeed: 0.1
   maxHealth: 4
   debrisDropped:
@@ -77,3 +84,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  debrisRange: 0.5
+  debrisImpulse: 5

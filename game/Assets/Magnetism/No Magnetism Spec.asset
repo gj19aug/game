@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 595820f0adb41d747a1406755bf19fe4, type: 3}
-  m_Name: Player Magnetism
+  m_Name: No Magnetism Spec
   m_EditorClassIdentifier: 
-  radius: 10
-  strength: 100
+  radius: 5
+  strength: 500
   strengthCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.5
-      value: 0.9
+      time: 0
+      value: 1
       inSlope: -2
       outSlope: -2
       tangentMode: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  packing: 0.2
+  packing: 0.1
   affectedLayers:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 0
