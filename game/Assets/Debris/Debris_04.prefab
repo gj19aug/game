@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transform: {fileID: 6519365182072298375}
   rigidbody: {fileID: 1534166656335943920}
-  collider: {fileID: 5133363689387886365}
+  collider: {fileID: 1317311848623202183}
 --- !u!1 &7349457937751111612
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,7 +110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3688318844180695987}
   - component: {fileID: 4956046039508373095}
-  - component: {fileID: 5133363689387886365}
+  - component: {fileID: 1317311848623202183}
   m_Layer: 10
   m_Name: Sprite
   m_TagString: Untagged
@@ -181,8 +181,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!60 &5133363689387886365
-PolygonCollider2D:
+--- !u!70 &1317311848623202183
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -195,22 +195,5 @@ PolygonCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.42580646, y: 0.5354839}
-    newSize: {x: 8.7, y: 10.66}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.12258064, y: 0.26774192}
-      - {x: -0.21290322, y: 0.048387095}
-      - {x: -0.21290322, y: -0.19032258}
-      - {x: -0.12258064, y: -0.26774192}
-      - {x: 0.17419355, y: -0.26774192}
-      - {x: 0.21290322, y: 0.016129032}
-      - {x: 0.21290322, y: 0.2612903}
-      - {x: 0.2, y: 0.26774192}
+  m_Size: {x: 0.42580646, y: 0.5354839}
+  m_Direction: 0

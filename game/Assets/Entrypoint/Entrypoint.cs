@@ -8,19 +8,101 @@ public class Entrypoint : MonoBehaviour
 {
     // Inspector
     public new CameraRefs camera;
-    public ShipRefs playerPrefab;
-    public WeaponRefs weaponPrefab;
-    public WeaponSpec playerWeaponSpec;
-    public WeaponSpec enemyWeaponSpec;
-    public ProjectileRefs projectilePrefab;
+    public ShipSpec playerSpec;
     public SpawnRefs[] enemySpawns;
     public DebrisRefs[] debrisPrefabs;
-    public ShipRefs[] enemyPrefabs;
-    public ImpactRefs impactPrefab;
-    public ExplosionRefs explosionPrefab;
 
     // Game State
     private GameState state;
+
+    // ---------------------------------------------------------------------------------------------
+    // Object Pooling
+
+    void InitializePools<T>(T prefab, int initialCount) where T : Refs
+    {
+        if (state.pools.ContainsKey(prefab)) return;
+
+        // TODO: remove the double cast (C# supports covariant/contravariant generics, right?)
+        var pool = new Pool<T>();
+        state.pools[prefab] = pool;
+        pool.Initialize(prefab, initialCount);
+    }
+
+    void InitializePools(SpawnSpec spec)
+    {
+        for (int i = 0; i < spec.ships.Length; i++)
+            InitializePools(spec.ships[i].spec, false);
+    }
+
+    void InitializePools(ShipSpec spec, bool isPlayer)
+    {
+        InitializePools(spec.shipPrefab, 16);
+        InitializePools(spec.explosionPrefab, 16);
+        InitializePools(spec.weaponSpec);
+        InitializePools(spec.magnetismSpec);
+        InitializePools(spec.aiSpec);
+    }
+
+    void InitializePools(WeaponSpec spec)
+    {
+        InitializePools(spec.weaponPrefab, 2 * 32);
+        InitializePools(spec.projectilePrefab, 256);
+        InitializePools(spec.impactPrefab, 64);
+    }
+
+    void InitializePools(MagnetismSpec spec) {}
+    void InitializePools(AISpec spec) {}
+
+    Pool<T> GetPool<T>(T prefab) where T : Refs
+    {
+        Assert.IsNotNull(prefab);
+        return (Pool<T>) state.pools[prefab];
+    }
+
+    Pool<T> FindPool<T>(T instance) where T : Refs
+    {
+        // HACK: Horribly inefficient
+        Assert.IsNotNull(instance);
+        foreach (var kvp in state.pools)
+        {
+            if (kvp.Value is Pool<T>)
+            {
+                var pool = (Pool<T>) kvp.Value;
+                if (pool.Contains(instance))
+                    return pool;
+            }
+        }
+        Assert.IsTrue(false);
+        return null;
+    }
+
+    T Spawn<T>(T prefab) where T : Refs
+    {
+        Assert.IsNotNull(prefab);
+        if (!state.pools.ContainsKey(prefab))
+            Debug.LogFormat("Spawn Pool missing for '{0}'", prefab.name);
+
+        var pool = (Pool<T>) state.pools[prefab];
+        return (T) pool.Spawn();
+    }
+
+    void Despawn<T>(T prefab, T instance) where T : Refs
+    {
+        Assert.IsNotNull(prefab);
+        Assert.IsNotNull(instance);
+        var pool = (Pool<T>) state.pools[prefab];
+        pool.Despawn(instance);
+    }
+
+    void Despawn<T>(T instance) where T : Refs
+    {
+        Assert.IsNotNull(instance);
+        var pool = FindPool(instance);
+        pool.Despawn(instance);
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Everything Else
 
     public static int GetKeyValue(KeyCode key)
     {
@@ -32,7 +114,7 @@ public class Entrypoint : MonoBehaviour
         Transform parent = ship.refs.physicsTransform;
 
         ref Weapon weapon = ref ship.weapons.Add();
-        weapon.refs = SpawnFromPoolSet(state.weaponPool);
+        weapon.refs = Spawn(spec.weaponPrefab);
         weapon.refs.transform.parent = parent;
         weapon.refs.transform.localPosition = relPos;
         weapon.refs.transform.localRotation = Quaternion.identity;
@@ -49,16 +131,17 @@ public class Entrypoint : MonoBehaviour
         for (int i = 0; i < ship.weapons.Count; i++)
         {
             ref Weapon w = ref ship.weapons[i];
-            DespawnFromPoolSet(state.weaponPool, w.refs);
-            // HACK:
-            w.refs.transform.parent = state.weaponPool.root;
+            Despawn(w.spec.weaponPrefab, w.refs);
+
+            Pool<WeaponRefs> pool = GetPool(w.spec.weaponPrefab);
+            w.refs.transform.parent = pool.root;
         }
         ship.weapons.Clear();
     }
 
     static void ProcessShipMovement(ref ShipCommon ship)
     {
-        ref ShipSpec spec = ref ship.refs.shipSpec;
+        ref ShipSpec spec = ref ship.spec;
         ref MoveState move = ref ship.move;
         ref ShipInput input = ref ship.input;
         Rigidbody2D rigidbody = ship.refs.rigidbody;
@@ -115,7 +198,7 @@ public class Entrypoint : MonoBehaviour
 
                 Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
 
-                ProjectileRefs pr = SpawnFromPoolSet(state.projectilePool);
+                ProjectileRefs pr = Spawn(spec.projectilePrefab);
                 int layer = isPlayer ? Layers.PlayerProjectile : Layers.EnemyProjectile;
                 pr.rigidbody.gameObject.layer = layer;
                 pr.collider.gameObject.layer = layer;
@@ -159,11 +242,11 @@ public class Entrypoint : MonoBehaviour
             if (ship.health <= 0)
             {
                 ref EnemyShip e = ref FindEnemy(ship.refs);
-                ShipSpec spec = e.common.refs.shipSpec;
+                ShipSpec spec = e.common.spec;
 
                 // Explosion VFX
                 ref ExplosionEffect effect = ref state.explosionEffects.Add();
-                effect.refs = state.explosionPool.Spawn();
+                effect.refs = Spawn(spec.explosionPrefab);
                 effect.refs.transform.position = impact.position;
                 effect.refs.transform.rotation = Quaternion.identity;
                 effect.lifetime = 0.9f;
@@ -175,7 +258,7 @@ public class Entrypoint : MonoBehaviour
                 for (int i = 0; i < count; i++)
                 {
                     Vector3 dir = Random.insideUnitCircle;
-                    DebrisRefs debris = SpawnFromPoolSet(state.debrisPools);
+                    DebrisRefs debris = Spawn(RandomEx.Element(debrisPrefabs));
                     debris.rigidbody.position = e.common.move.p + (1.0f + spec.debrisRange) * dir;
                     debris.rigidbody.rotation = 360.0f * Random.value;
                     debris.rigidbody.AddForce(spec.debrisImpulse * Random.Range(0.5f, 1.5f) * dir, ForceMode2D.Impulse);
@@ -184,65 +267,17 @@ public class Entrypoint : MonoBehaviour
         }
     }
 
-    Pool<T> CreatePoolSet<T>(T prefab, int poolCount) where T : MonoBehaviour
-    {
-        var pool = new Pool<T>();
-        pool.Initialize(prefab, poolCount);
-        return pool;
-    }
-
-    T SpawnFromPoolSet<T>(Pool<T> pool) where T : MonoBehaviour
-    {
-        T instance = pool.Spawn();
-        return instance;
-    }
-
-    void DespawnFromPoolSet<T>(Pool<T> pool, T instance) where T : MonoBehaviour
-    {
-        pool.Despawn(instance);
-    }
-
-    Pool<T>[] CreatePoolSet<T>(T[] prefabs, int poolCount) where T : MonoBehaviour
-    {
-        var pools = new Pool<T>[prefabs.Length];
-        for (int i = 0; i < prefabs.Length; i++)
-        {
-            T prefab = prefabs[i];
-            var pool = new Pool<T>();
-            pool.Initialize(prefab, poolCount);
-            pools[i] = pool;
-        }
-        return pools;
-    }
-
-    T SpawnFromPoolSet<T>(Pool<T>[] pools) where T : MonoBehaviour
-    {
-        Pool<T> pool = RandomEx.Element(pools);
-        T instance = pool.Spawn();
-        return instance;
-    }
-
-    void DespawnFromPoolSet<T>(Pool<T>[] pools, T instance) where T : MonoBehaviour
-    {
-        for (int i = 0; i < pools.Length; i++)
-        {
-            Pool<T> pool = pools[i];
-            if (pool.TryDespawn(instance))
-                return;
-        }
-        Assert.IsTrue(false);
-    }
-
-    ref EnemyShip SpawnEnemy(Vector3 position)
+    ref EnemyShip SpawnEnemy(ShipSpec spec, Vector3 position)
     {
         ref EnemyShip e = ref state.enemies.Add();
-        e.common.refs = SpawnFromPoolSet(state.enemyPools);
+        e.common.spec = spec;
+        e.common.refs = Spawn(spec.shipPrefab);
         e.common.weapons = new RefList<Weapon>(2);
-        e.common.health = e.common.refs.shipSpec.maxHealth;
+        e.common.health = e.common.spec.maxHealth;
         e.common.move.p = position;
 
-        AddWeapon(ref e.common, enemyWeaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
-        AddWeapon(ref e.common, enemyWeaponSpec, new Vector3(+1.0f, 0.0f, 0.0f));
+        AddWeapon(ref e.common, spec.weaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
+        AddWeapon(ref e.common, spec.weaponSpec, new Vector3(+1.0f, 0.0f, 0.0f));
 
         e.target = state.player.common.refs;
         return ref e;
@@ -253,8 +288,8 @@ public class Entrypoint : MonoBehaviour
         EnemyShip e = enemy;
         for (int i = 0; i < e.common.weapons.Count; i++)
             RemoveWeapons(ref e.common);
+        Despawn(e.common.spec.shipPrefab, e.common.refs);
         state.enemies.Remove(ref e);
-        DespawnFromPoolSet(state.enemyPools, e.common.refs);
 
         // NOTE: Enemies may not necessarily come from spawners
         for (int i = 0; i < state.enemySpawns.Length; i++)
@@ -308,20 +343,27 @@ public class Entrypoint : MonoBehaviour
         return ref state.enemies[0];
     }
 
+    // ---------------------------------------------------------------------------------------------
+    // Unity Events
+
     void Awake()
     {
         float t = Time.fixedTime;
 
-        state.weaponPool = CreatePoolSet(weaponPrefab, 32);
-        state.projectilePool = CreatePoolSet(projectilePrefab, 128);
+        state.pools = new Dictionary<Refs, object>(32);
+        InitializePools(playerSpec, true);
+        for (int i = 0; i < enemySpawns.Length; i++)
+            InitializePools(enemySpawns[i].spec);
+        for (int i = 0; i < debrisPrefabs.Length; i++)
+            InitializePools(debrisPrefabs[i], 256);
+
+        state.colliderCache = new Collider2D[32];
+        state.impactCache = new RefList<Impact>(32);
+
         state.projectiles = new List<Projectile>(128);
-        state.debrisPools = CreatePoolSet(debrisPrefabs, 256);
-        state.enemyPools = CreatePoolSet(enemyPrefabs, 32);
-        state.enemies = new RefList<EnemyShip>(64);
-        state.impactPool = CreatePoolSet(impactPrefab, 128);
         state.impactEffects = new RefList<ImpactEffect>(128);
-        state.explosionPool = CreatePoolSet(explosionPrefab, 128);
         state.explosionEffects = new RefList<ExplosionEffect>(128);
+        state.enemies = new RefList<EnemyShip>(64);
 
         state.enemySpawns = new Spawn[enemySpawns.Length];
         for (int i = 0; i < enemySpawns.Length; i++)
@@ -333,16 +375,14 @@ public class Entrypoint : MonoBehaviour
             spawn.ships = new List<ShipRefs>(refs.spec.maxCount);
         }
 
-        state.colliderCache = new Collider2D[32];
-        state.impactCache = new RefList<Impact>(32);
-
         // Spawn player
         {
-            state.player.common.refs = Instantiate(playerPrefab);
+            state.player.common.spec = playerSpec;
+            state.player.common.refs = Instantiate(playerSpec.shipPrefab);
             state.player.common.weapons = new RefList<Weapon>(2);
             state.player.debris = new List<DebrisRefs>(128);
-            AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
-            AddWeapon(ref state.player.common, playerWeaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
+            AddWeapon(ref state.player.common, playerSpec.weaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
+            AddWeapon(ref state.player.common, playerSpec.weaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
         }
 
         // DEBUG: Spawn a bunch of debris
@@ -403,7 +443,7 @@ public class Entrypoint : MonoBehaviour
             if (count == 0) continue;
 
             // Despawn
-            state.projectilePool.Despawn(p.refs);
+            Despawn(p.spec.projectilePrefab, p.refs);
             state.projectiles.RemoveAt(i);
 
             // TODO: I wonder if this indirection is a bad idea?
@@ -431,7 +471,7 @@ public class Entrypoint : MonoBehaviour
             effect.lifetime -= dt;
             if (effect.lifetime <= 0.0f)
             {
-                state.explosionPool.Despawn(effect.refs);
+                Despawn(effect.refs);
                 state.explosionEffects.RemoveAt(i);
             }
         }
@@ -444,7 +484,7 @@ public class Entrypoint : MonoBehaviour
             effect.lifetime -= dt;
             if (effect.lifetime <= 0.0f)
             {
-                state.impactPool.Despawn(effect.refs);
+                Despawn(effect.refs);
                 state.impactEffects.RemoveAt(i);
             }
         }
@@ -464,7 +504,7 @@ public class Entrypoint : MonoBehaviour
 
                 // VFX
                 ref ImpactEffect effect = ref state.impactEffects.Add();
-                effect.refs = state.impactPool.Spawn();
+                effect.refs = Spawn(impact.spec.impactPrefab);
                 effect.refs.transform.position = impact.position;
                 effect.refs.transform.rotation = Random.rotation;
                 effect.lifetime = 0.7f;
@@ -509,6 +549,8 @@ public class Entrypoint : MonoBehaviour
         // TODO: Should the camera have a rigidbody for movement interpolation?
         camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
         camera.camera.orthographicSize = 7.0f + (player.common.refs.physicsTransform.childCount * 0.01f);
+        Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+        Debug.Log("Debris Attached to ship: " + player.common.refs.physicsTransform.childCount);
 
         // TODO: Horribly inefficient
         // Projectiles
@@ -519,7 +561,7 @@ public class Entrypoint : MonoBehaviour
             state.projectiles[i] = p;
             if (p.lifetime <= 0)
             {
-                state.projectilePool.Despawn(p.refs);
+                Despawn(p.spec.projectilePrefab, p.refs);
                 state.projectiles.RemoveAt(i);
             }
         }
@@ -528,7 +570,7 @@ public class Entrypoint : MonoBehaviour
         {
             ref MoveState move = ref state.player.common.move;
             ShipRefs refs = player.common.refs;
-            MagnetismSpec mag = player.common.refs.magnetismSpec;
+            MagnetismSpec mag = player.common.spec.magnetismSpec;
 
             // Attach debris that's touching the player
             int attachCount = refs.rigidbody.GetContacts(state.colliderCache);
@@ -549,12 +591,8 @@ public class Entrypoint : MonoBehaviour
                 DestroyImmediate(dr.rigidbody);
                 dr.rigidbody = null;
 
-                // TODO: Horribly inefficient
-                for (int j = 0; j < state.debrisPools.Length; j++)
-                {
-                    if (state.debrisPools[j].Remove(dr))
-                        break;
-                }
+                Pool<DebrisRefs> pool = FindPool(dr);
+                pool.Remove(dr);
             }
 
             // Apply force to nearby objects
@@ -594,7 +632,9 @@ public class Entrypoint : MonoBehaviour
                         // BUG: Floating point issues for large t
                         spawn.nextSpawnTime += spec.timeBetweenSpawns;
                         Vector3 pos = spawn.refs.transform.position + (Vector3) (5.0f * Random.insideUnitCircle);
-                        ref EnemyShip e = ref SpawnEnemy(pos);
+                        // TODO: Weighted random
+                        ShipSpawnSpec enemySpawn = RandomEx.Element(spec.ships);
+                        ref EnemyShip e = ref SpawnEnemy(enemySpawn.spec, pos);
                         spawn.ships.Add(e.common.refs);
                     }
                 }
@@ -609,7 +649,7 @@ public class Entrypoint : MonoBehaviour
 
         ref ShipCommon ship = ref state.player.common;
         ref ShipRefs refs = ref state.player.common.refs;
-        ref MagnetismSpec mag = ref state.player.common.refs.magnetismSpec;
+        ref MagnetismSpec mag = ref state.player.common.spec.magnetismSpec;
 
         if (EditorApplication.isPlaying)
         {

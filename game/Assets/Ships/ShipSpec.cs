@@ -3,7 +3,11 @@
 [CreateAssetMenu(fileName = "New Ship Spec", menuName = "Ship Spec")]
 public class ShipSpec : ScriptableObject
 {
-    //[Header("The effective movement formula is x1 = x0 + 0.5 (drag * dragCurve(vMul * v) * aMul * input) * t^2 + vt")]
+    public ShipRefs shipPrefab;
+    public ExplosionRefs explosionPrefab;
+    public WeaponSpec weaponSpec;
+    public MagnetismSpec magnetismSpec;
+    public AISpec aiSpec;
 
     [Tooltip("Determines how fast the character will accelerate from a stop. Also increases top speed.")]
     [Range(0, 100)]

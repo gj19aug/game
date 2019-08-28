@@ -5,29 +5,17 @@ using UnityEngine;
 [Serializable]
 public struct GameState
 {
-    // Player
+    // Data
     public PlayerShip player;
-
-    // Weapons
-    public Pool<WeaponRefs> weaponPool;
-    public Pool<ProjectileRefs> projectilePool;
     public List<Projectile> projectiles;
-    public Pool<ImpactRefs> impactPool;
-    public Pool<ExplosionRefs> explosionPool;
-
-    // Visual FX
     public RefList<ImpactEffect> impactEffects;
     public RefList<ExplosionEffect> explosionEffects;
-
-    // Debris
-    public Pool<DebrisRefs>[] debrisPools;
-
-    // Enemies
-    public Pool<ShipRefs>[] enemyPools;
     public RefList<EnemyShip> enemies;
     public Spawn[] enemySpawns;
 
     // Caches
+    // HACK: Can't cast between Pool<T> and Pool<Refs> *sigh*
+    public Dictionary<Refs, object> pools;
     public Collider2D[] colliderCache;
     public RefList<Impact> impactCache;
 }
@@ -38,6 +26,7 @@ public class Refs : MonoBehaviour {}
 [Serializable]
 public struct ShipCommon
 {
+    public ShipSpec spec;
     public ShipRefs refs;
     public MoveState move;
     public ShipInput input;
