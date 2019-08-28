@@ -549,6 +549,8 @@ public class Entrypoint : MonoBehaviour
         // TODO: Should the camera have a rigidbody for movement interpolation?
         camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
         camera.camera.orthographicSize = 7.0f + (player.common.refs.physicsTransform.childCount * 0.01f);
+        Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+        Debug.Log("Debris Attached to ship: " + player.common.refs.physicsTransform.childCount);
 
         // TODO: Horribly inefficient
         // Projectiles

@@ -99,7 +99,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transform: {fileID: 6519365182072298375}
   rigidbody: {fileID: 8781183109541427518}
-  collider: {fileID: 2726545993085007165}
+  collider: {fileID: 4550626782031266982}
 --- !u!1 &8577622538392678373
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,7 +110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3688318844180695987}
   - component: {fileID: 4956046039508373095}
-  - component: {fileID: 2726545993085007165}
+  - component: {fileID: 4550626782031266982}
   m_Layer: 10
   m_Name: Sprite
   m_TagString: Untagged
@@ -181,8 +181,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!60 &2726545993085007165
-PolygonCollider2D:
+--- !u!61 &4550626782031266982
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -194,7 +194,7 @@ PolygonCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.022793233, y: 0.027858377}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -204,23 +204,6 @@ PolygonCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.14838709, y: 0.10967742}
-      - {x: -0.012903226, y: 0.15483871}
-      - {x: -0.24516128, y: 0.15483871}
-      - {x: -0.38064516, y: 0.13548388}
-      - {x: -0.38064516, y: 0.058064517}
-      - {x: -0.36774194, y: 0.025806451}
-      - {x: -0.29032257, y: -0.006451613}
-      - {x: -0.21290322, y: -0.032258064}
-      - {x: 0.103225805, y: -0.12903225}
-      - {x: 0.20645161, y: -0.15483871}
-      - {x: 0.3612903, y: -0.15483871}
-      - {x: 0.3612903, y: -0.058064517}
-      - {x: 0.32258064, y: -0.012903226}
-    - - {x: 0.3548387, y: -0.12903225}
-      - {x: 0.3612903, y: -0.14838709}
-      - {x: 0.38064516, y: -0.14838709}
-      - {x: 0.38064516, y: -0.11612903}
-      - {x: 0.36774194, y: -0.11612903}
+  serializedVersion: 2
+  m_Size: {x: 0.5941398, y: 0.25396067}
+  m_EdgeRadius: 0
