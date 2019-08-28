@@ -1,18 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class RestartButton : MonoBehaviour
 {
-
-    public void RestartGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(0, LoadSceneMode.Single);
-
-    }
-
-
-    
+	public void RestartGame()
+	{
+		Time.timeScale = 1f;
+		SceneManager.LoadScene(0, LoadSceneMode.Single);
+	}
 }

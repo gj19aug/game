@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
 
 public class Entrypoint : MonoBehaviour
@@ -112,17 +113,18 @@ public class Entrypoint : MonoBehaviour
     void AddWeapon(ref ShipCommon ship, WeaponSpec spec, Vector3 relPos)
     {
         Transform parent = ship.refs.physicsTransform;
+        Assert.AreApproximatelyEqual(Mathf.Abs(spec.weaponPrefab.transform.localScale.x), 1.0f);
 
         ref Weapon weapon = ref ship.weapons.Add();
         weapon.refs = Spawn(spec.weaponPrefab);
         weapon.refs.transform.parent = parent;
         weapon.refs.transform.localPosition = relPos;
         weapon.refs.transform.localRotation = Quaternion.identity;
+        weapon.refs.transform.localScale = Vector3.one;
         weapon.spec = spec;
         // NOTE: Assume x is down
         float angle = Vector2.SignedAngle(relPos, Vector2.down);
         Assert.IsTrue(angle >= -180 && angle <= 180);
-        Assert.AreApproximatelyEqual(Mathf.Abs(weapon.refs.transform.localScale.x), 1.0f);
         weapon.refs.transform.SetScaleX(Mathf.Sign(angle));
     }
 
@@ -436,6 +438,7 @@ public class Entrypoint : MonoBehaviour
         float dt = Time.fixedDeltaTime;
 
         // Projectile Impacts
+        Profiler.BeginSample("Projectile Impacts");
         for (int i = state.projectiles.Count - 1; i >= 0 ; i--)
         {
             Projectile p = state.projectiles[i];
@@ -462,8 +465,10 @@ public class Entrypoint : MonoBehaviour
                 }
             }
         }
+        Profiler.EndSample();
 
         // Check to see if ship explosion needs to be despawned
+        Profiler.BeginSample("Ship Explosion");
         for (int i = state.explosionEffects.Count - 1; i >= 0; i--)
         {
             ref ExplosionEffect effect = ref state.explosionEffects[i];
@@ -475,8 +480,10 @@ public class Entrypoint : MonoBehaviour
                 state.explosionEffects.RemoveAt(i);
             }
         }
+        Profiler.EndSample();
 
         // Check to see if hit effect needs to be despawned
+        Profiler.BeginSample("Projectile Impact Despawn");
         for (int i = state.impactEffects.Count - 1; i >= 0; i--)
         {
             ref ImpactEffect effect = ref state.impactEffects[i];
@@ -488,8 +495,10 @@ public class Entrypoint : MonoBehaviour
                 state.impactEffects.RemoveAt(i);
             }
         }
+        Profiler.EndSample();
 
         // Process Impacts
+        Profiler.BeginSample("Process Projectile Impacts");
         for (int i = 0; i < state.impactCache.Count; i++)
         {
             ref Impact impact = ref state.impactCache[i];
@@ -515,7 +524,9 @@ public class Entrypoint : MonoBehaviour
             }
         }
         state.impactCache.Clear();
+        Profiler.EndSample();
 
+        Profiler.BeginSample("Ship Update");
         ref PlayerShip player = ref state.player;
         ProcessShipMovement(ref player.common);
         ProcessShipWeapons(ref player.common, true);
@@ -544,16 +555,20 @@ public class Entrypoint : MonoBehaviour
             ProcessShipMovement(ref enemy.common);
             ProcessShipWeapons(ref enemy.common, false);
         }
+        Profiler.EndSample();
 
         // Camera
+        Profiler.BeginSample("Camera Update");
         // TODO: Should the camera have a rigidbody for movement interpolation?
         camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
         camera.camera.orthographicSize = 7.0f + (player.common.refs.physicsTransform.childCount * 0.01f);
-        Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-        Debug.Log("Debris Attached to ship: " + player.common.refs.physicsTransform.childCount);
+        //Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+        //Debug.Log("Debris Attached to ship: " + player.common.refs.physicsTransform.childCount);
+        Profiler.EndSample();
 
         // TODO: Horribly inefficient
         // Projectiles
+        Profiler.BeginSample("Projectile Depawn");
         for (int i = 0; i < state.projectiles.Count; i++)
         {
             Projectile p = state.projectiles[i];
@@ -565,8 +580,10 @@ public class Entrypoint : MonoBehaviour
                 state.projectiles.RemoveAt(i);
             }
         }
+        Profiler.EndSample();
 
         // Magnetism
+        Profiler.BeginSample("Magnetism Update");
         {
             ref MoveState move = ref state.player.common.move;
             ShipRefs refs = player.common.refs;
@@ -617,8 +634,10 @@ public class Entrypoint : MonoBehaviour
                 rb.AddForce(force, ForceMode2D.Force);
             }
         }
+        Profiler.EndSample();
 
         // Spawning
+        Profiler.BeginSample("Enemy Spawning");
         {
             for (int i = 0; i < state.enemySpawns.Length; i++)
             {
@@ -640,6 +659,7 @@ public class Entrypoint : MonoBehaviour
                 }
             }
         }
+        Profiler.EndSample();
     }
 
     #if UNITY_EDITOR

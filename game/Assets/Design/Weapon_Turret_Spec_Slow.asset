@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d865a9a6c325efd42b6adf29e0c4f889, type: 3}
   m_Name: Weapon_Turret_Spec_Slow
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: -1356371067432790409, guid: c1c6ca7e8c1b35543ba7a73bb7cd9bce,
+  weaponPrefab: {fileID: 6795343969222469785, guid: 3999d4b6a3b126b40b9063f44b5c4a80,
     type: 3}
   projectilePrefab: {fileID: 4004167460313986225, guid: 0c1665d2737eb8a4c90e30eed6ae45bc,
     type: 3}
