@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d865a9a6c325efd42b6adf29e0c4f889, type: 3}
-  m_Name: Turret_Spec_Medium
+  m_Name: Weapon_Missle_Spec
   m_EditorClassIdentifier: 
-  weaponPrefab: {fileID: 6795343969222469785, guid: 3999d4b6a3b126b40b9063f44b5c4a80,
+  weaponPrefab: {fileID: -1356371067432790409, guid: c1c6ca7e8c1b35543ba7a73bb7cd9bce,
     type: 3}
-  projectilePrefab: {fileID: 4004167460313986225, guid: 0c1665d2737eb8a4c90e30eed6ae45bc,
+  projectilePrefab: {fileID: 7986669731472807377, guid: a1fc979ad78fdc84c9e23a0ef9f1ac9a,
     type: 3}
   impactPrefab: {fileID: 6427970028925150938, guid: db9fcde46778fa54590ea53fb96cd4fc,
     type: 3}
-  refireDelay: 0.5
-  impulse: 15
-  lifetime: 3
-  turnSpeed: 0.2
+  refireDelay: 1.5
+  impulse: 5
+  lifetime: 5
+  turnSpeed: 0.1
   damage: 1
