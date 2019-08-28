@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5681561333199843091}
   - component: {fileID: 9048147101270342473}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Asteroid02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +55,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2854088041662018084}
   - component: {fileID: 4478515748456909768}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Physics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 166730230619078526}
   - component: {fileID: 9188325936557029724}
   - component: {fileID: 7525442727175031221}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
