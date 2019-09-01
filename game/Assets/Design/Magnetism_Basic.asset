@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Magnetism_Basic
   m_EditorClassIdentifier: 
   radius: 10
-  strength: 100
+  strength: 200
   strengthCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.5
-      value: 0.9
+      time: -0.11458284
+      value: 0.9907869
       inSlope: -2
       outSlope: -2
       tangentMode: 0

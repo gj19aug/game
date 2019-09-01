@@ -17,9 +17,9 @@ MonoBehaviour:
   explosionPrefab: {fileID: 1099061329349664048, guid: a4a9ad99ca01ed0448e6951e2401f745,
     type: 3}
   weaponSpec: {fileID: 11400000, guid: 6c6d17c0861392e428314822f0a610ed, type: 2}
-  magnetismSpec: {fileID: 11400000, guid: d77617e2d57a3d24383cd3409e4e9630, type: 2}
+  magnetismSpec: {fileID: 11400000, guid: b6ed92d16c3ecd142a61e6bc86e80f86, type: 2}
   aiSpec: {fileID: 0}
-  acceleration: 25
+  acceleration: 30
   drag: 3
   dragCurve:
     serializedVersion: 2
