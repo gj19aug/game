@@ -220,13 +220,6 @@ public class Entrypoint : MonoBehaviour
                 state.projectiles.Add(p);
             }
         }
-
-        // HACK: Unity input is a pile of radioactive garbage
-        ShipInput prevInput = input;
-        input = new ShipInput();
-        input.throttle = prevInput.throttle;
-        input.point = prevInput.point;
-        input.aim = prevInput.aim;
     }
 
     void ProcessShipImpact(ref ShipCommon ship, ref Impact impact)
@@ -247,7 +240,6 @@ public class Entrypoint : MonoBehaviour
                 state.colliderCache,
                 Layers.Player.Mask);
 
-            if (count > 0) Debug.Log("Processing Hits");
             for (int i = 0; i < count; i++)
             {
                 Collider2D collider = state.colliderCache[i];
@@ -261,10 +253,8 @@ public class Entrypoint : MonoBehaviour
                         if (debris.refs != dr) continue;
 
                         float dist = ((Vector3) collider.ClosestPoint(impact.position) - impact.position).magnitude;
-                        float damage = (dist / impact.spec.damageRadius) * impact.spec.damage;
+                        float damage = Mathf.Lerp(0, impact.spec.damage, 1.0f - (dist / impact.spec.damageRadius));
                         Assert.IsTrue(dist <= impact.spec.damageRadius + Mathf.Epsilon);
-
-                        Debug.LogFormat(collider, "Hit ({0})", debris.health - damage);
 
                         debris.health -= damage;
                         if (debris.health <= 0.0f)
@@ -272,8 +262,8 @@ public class Entrypoint : MonoBehaviour
                             // TODO: Having to destroy instead of disable is pretty lame.
                             dr.rigidbody = dr.physicsTransform.gameObject.AddComponent<Rigidbody2D>();
                             dr.rigidbody.gravityScale = 0.0f;
-                            dr.rigidbody.gameObject.layer = Layers.Environment.Index;
-                            dr.collider.gameObject.layer = Layers.Environment.Index;
+                            dr.rigidbody.gameObject.layer = Layers.Background.Index;
+                            dr.collider.gameObject.layer = Layers.Background.Index;
 
                             float impulse = Random.Range(0.5f, 1.5f) * 10.0f * damage;
                             Vector3 impulseDir = (Vector3) dr.physicsTransform.position - ship.move.p;
@@ -283,6 +273,7 @@ public class Entrypoint : MonoBehaviour
                             debris.pool.Add(dr);
                             dr.transform.parent = debris.pool.root;
                             state.player.debris.RemoveAt(j);
+                            RecalculatePlayerRadius();
                         }
                     }
                 }
@@ -334,6 +325,7 @@ public class Entrypoint : MonoBehaviour
         e.common.weapons = new RefList<Weapon>(2);
         e.common.health = e.common.spec.initialHealth;
         e.common.move.p = position;
+        e.common.refs.rigidbody.position = position;
 
         AddWeapon(ref e.common, spec.weaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
         AddWeapon(ref e.common, spec.weaponSpec, new Vector3(+1.0f, 0.0f, 0.0f));
@@ -411,6 +403,34 @@ public class Entrypoint : MonoBehaviour
         debris.rigidbody.AddTorque(0.05f * impulse, ForceMode2D.Impulse);
     }
 
+    void RecalculatePlayerRadius()
+    {
+        ref PlayerShip player = ref state.player;
+        ref MoveState move = ref state.player.common.move;
+        ShipRefs refs = state.player.common.refs;
+
+        CircleCollider2D collider = refs.collider as CircleCollider2D;
+        player.radius = collider.radius;
+
+        #if false
+        float radius = 0;
+        float maxDistSq = 0;
+        for (int i = 0; i < player.debris.Count; i++)
+        {
+            CircleCollider2D debrisCollider = player.debris[i].refs.collider as CircleCollider2D;
+            float distSq = ((Vector3) debrisCollider.offset + debrisCollider.transform.position - move.p).sqrMagnitude;
+            if (distSq > 0.0f && distSq >= maxDistSq)
+            {
+                maxDistSq = distSq;
+                radius = Mathf.Max(radius, debrisCollider.radius);
+            }
+        }
+        player.radius = Mathf.Max(Mathf.Sqrt(maxDistSq) + radius);
+        #else
+        player.radius += Mathf.Sqrt(0.005f * player.debris.Count);
+        #endif
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Unity Events
 
@@ -426,6 +446,7 @@ public class Entrypoint : MonoBehaviour
             InitializePools(debrisPrefabs[i], 256);
 
         state.colliderCache = new Collider2D[32];
+        state.contactCache = new ContactPoint2D[32];
         state.impactCache = new RefList<Impact>(32);
         state.lastImpactPositions = new List<Vector3>(8);
 
@@ -450,6 +471,7 @@ public class Entrypoint : MonoBehaviour
             state.player.common.refs = Instantiate(playerSpec.shipPrefab);
             state.player.common.weapons = new RefList<Weapon>(2);
             state.player.debris = new RefList<AttachedDebris>(128);
+            RecalculatePlayerRadius();
             AddWeapon(ref state.player.common, playerSpec.weaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
             AddWeapon(ref state.player.common, playerSpec.weaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
         }
@@ -459,10 +481,10 @@ public class Entrypoint : MonoBehaviour
         player.health = playerSpec.initialHealth;
         for (int i = 0; i < player.health; i++)
         {
-            Vector3 position = 5.0f * Random.insideUnitCircle + Vector2.one;
+            Vector3 relPos = Random.insideUnitCircle;
+            relPos = 4.0f * relPos + 1.0f * relPos.normalized + player.move.p;
             float impulse = 1.0f * Random.Range(0.5f, 1.5f);
-            Vector3 toPlayer = state.player.common.move.p - position;
-            SpawnDebris(position, impulse, toPlayer);
+            SpawnDebris(player.move.p + relPos, impulse, -relPos);
         }
 
         // TODO: Figure out player-enemy collisions!
@@ -490,6 +512,9 @@ public class Entrypoint : MonoBehaviour
         // Shoot
         input.shoot = Input.GetKey(KeyCode.Mouse0) | Input.GetKey(KeyCode.Space);
 
+        // Cheats
+        input.cheatHealth = Input.GetKey(KeyCode.F1);
+
         // HACK: Reset
         if (Input.GetKeyDown(KeyCode.R))
             SceneManager.LoadScene(0, LoadSceneMode.Single);
@@ -507,7 +532,7 @@ public class Entrypoint : MonoBehaviour
         for (int i = state.projectiles.Count - 1; i >= 0 ; i--)
         {
             Projectile p = state.projectiles[i];
-            int count = p.refs.rigidbody.GetContacts(state.colliderCache);
+            int count = p.refs.rigidbody.GetContacts(state.contactCache);
             if (count == 0) continue;
 
             // Despawn
@@ -518,11 +543,15 @@ public class Entrypoint : MonoBehaviour
             // Register Impact
             for (int j = 0; j < count; j++)
             {
-                ShipRefs victim = state.colliderCache[j].GetComponentInParent<ShipRefs>();
+                // NOTE: 'other' is the projectile, regular is the victim
+                ref ContactPoint2D contact = ref state.contactCache[j];
+                if (contact.rigidbody == null) continue;
+
+                ShipRefs victim = contact.rigidbody.GetComponentInParent<ShipRefs>();
                 if (victim != null)
                 {
                     ref Impact impact = ref state.impactCache.Add();
-                    impact.position = p.refs.rigidbody.transform.position;
+                    impact.position = contact.point;
                     impact.spec = p.spec;
                     impact.owner = p.owner;
                     impact.victim = victim;
@@ -630,7 +659,7 @@ public class Entrypoint : MonoBehaviour
         Profiler.BeginSample("Camera Update");
         // TODO: Should the camera have a rigidbody for movement interpolation?
         camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
-        camera.camera.orthographicSize = 7.0f + (player.common.refs.physicsTransform.childCount * 0.01f);
+        camera.camera.orthographicSize = 7.0f + Mathf.Sqrt(0.05f * player.common.refs.physicsTransform.childCount);
         //Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
         //Debug.Log("Debris Attached to ship: " + player.common.refs.physicsTransform.childCount);
         Profiler.EndSample();
@@ -692,6 +721,7 @@ public class Entrypoint : MonoBehaviour
                 dr.physicsTransform.position = move.p + relPos;
                 dr.transform.parent = refs.physicsTransform;
                 player.common.health++;
+                RecalculatePlayerRadius();
 
                 ref AttachedDebris debris = ref player.debris.Add();
                 debris.refs = dr;
@@ -749,6 +779,24 @@ public class Entrypoint : MonoBehaviour
             }
         }
         Profiler.EndSample();
+
+        // Cheats
+        Profiler.BeginSample("Cheats");
+        {
+            ref ShipInput input = ref player.common.input;
+            if (input.cheatHealth)
+            {
+                ref MoveState move = ref state.player.common.move;
+                for (int j = 0; j < 10; j++)
+                {
+                    Vector3 relPos = Random.insideUnitCircle;
+                    relPos = 4.0f * relPos + (player.radius + 1.0f) * relPos.normalized;
+                    float impulse = 1.0f * Random.Range(0.5f, 1.5f);
+                    SpawnDebris(move.p + relPos, impulse, -relPos);
+                }
+            }
+        }
+        Profiler.EndSample();
     }
 
     #if UNITY_EDITOR
@@ -756,6 +804,7 @@ public class Entrypoint : MonoBehaviour
     {
         if (state.player.common.refs == null) return;
 
+        ref PlayerShip player = ref state.player;
         ref ShipCommon ship = ref state.player.common;
         ShipRefs refs = state.player.common.refs;
         MagnetismSpec mag = state.player.common.spec.magnetismSpec;
@@ -770,6 +819,8 @@ public class Entrypoint : MonoBehaviour
                 Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
                 Gizmos.DrawLine(pos, pos + aim);
             }
+
+            Gizmos.DrawWireSphere(ship.move.p, player.radius);
         }
 
         if (mag != null)

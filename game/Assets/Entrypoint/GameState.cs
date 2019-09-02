@@ -18,6 +18,7 @@ public struct GameState
     // let you cast between Pool<T> and Pool<Refs> unless going through a covariant interface *sigh*
     public Dictionary<Refs, object> pools;
     public Collider2D[] colliderCache;
+    public ContactPoint2D[] contactCache;
     public RefList<Impact> impactCache;
     public List<Vector3> lastImpactPositions;
 }
@@ -40,6 +41,7 @@ public struct ShipCommon
 public struct PlayerShip
 {
     public ShipCommon common;
+    public float radius;
     public RefList<AttachedDebris> debris;
 }
 
@@ -66,6 +68,7 @@ public struct ShipInput
     public Vector3 point;
     public Vector3 aim;
     public bool shoot;
+    public bool cheatHealth;
 }
 
 [Serializable]
