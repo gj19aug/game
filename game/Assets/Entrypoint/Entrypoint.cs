@@ -257,11 +257,10 @@ public class Entrypoint : MonoBehaviour
                 int count = Mathf.RoundToInt(floatCount);
                 for (int i = 0; i < count; i++)
                 {
-                    Vector3 dir = Random.insideUnitCircle;
-                    DebrisRefs debris = Spawn(RandomEx.Element(debrisPrefabs));
-                    debris.rigidbody.position = e.common.move.p + (1.0f + spec.debrisRange) * dir;
-                    debris.rigidbody.rotation = 360.0f * Random.value;
-                    debris.rigidbody.AddForce(spec.debrisImpulse * Random.Range(0.5f, 1.5f) * dir, ForceMode2D.Impulse);
+                    float impulse = spec.debrisImpulse * Random.Range(0.5f, 1.5f);
+                    Vector3 impulseDir = Random.insideUnitCircle;
+                    Vector3 position = e.common.move.p + (1.0f + spec.debrisRange) * impulseDir;
+                    SpawnDebris(position, impulse, impulseDir);
                 }
             }
         }
@@ -343,6 +342,15 @@ public class Entrypoint : MonoBehaviour
         return ref state.enemies[0];
     }
 
+    void SpawnDebris(Vector3 position, float impulse, Vector3 impulseDir)
+    {
+        DebrisRefs debris = Spawn(RandomEx.Element(debrisPrefabs));
+        debris.rigidbody.position = position;
+        debris.rigidbody.rotation = 360.0f * Random.value;
+        debris.rigidbody.AddForce(impulse * impulseDir, ForceMode2D.Impulse);
+        debris.rigidbody.AddTorque(0.05f * impulse, ForceMode2D.Impulse);
+    }
+
     // ---------------------------------------------------------------------------------------------
     // Unity Events
 
@@ -385,20 +393,17 @@ public class Entrypoint : MonoBehaviour
             AddWeapon(ref state.player.common, playerSpec.weaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
         }
 
-        // DEBUG: Spawn a bunch of debris
-        #if false
+        // TODO: Spec for starting health
+        // Spawn debris to initialize player health
         for (int i = 0; i < 20; i++)
         {
-            DebrisRefs debris = SpawnFromPoolSet(state.debrisPools);
-            debris.rigidbody.position = 10.0f * Random.insideUnitCircle;
-            debris.rigidbody.rotation = 360.0f * Random.value;
-            debris.rigidbody.AddForce(Random.insideUnitCircle, ForceMode2D.Impulse);
+            Vector3 position = 5.0f * Random.insideUnitCircle + Vector2.one;
+            float impulse = 1.0f * Random.Range(0.5f, 1.5f);
+            Vector3 toPlayer = state.player.common.move.p - position;
+            SpawnDebris(position, impulse, toPlayer);
         }
-        #endif
 
         // TODO: Figure out player-enemy collisions!
-        // DEBUG: Spawn an enemy
-        //SpawnEnemy(new Vector3(5, 0, 0));
     }
 
     void Update()

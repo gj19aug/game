@@ -14,7 +14,8 @@ public struct GameState
     public Spawn[] enemySpawns;
 
     // Caches
-    // HACK: Can't cast between Pool<T> and Pool<Refs> *sigh*
+    // HACK: 'object' here is a Pool<T> where T : Refs. Can't put the actual type because C# won't
+    // let you cast between Pool<T> and Pool<Refs> unless going through a covariant interface *sigh*
     public Dictionary<Refs, object> pools;
     public Collider2D[] colliderCache;
     public RefList<Impact> impactCache;
