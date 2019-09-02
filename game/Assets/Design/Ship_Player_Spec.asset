@@ -18,7 +18,6 @@ MonoBehaviour:
     type: 3}
   weaponSpec: {fileID: 11400000, guid: 6c6d17c0861392e428314822f0a610ed, type: 2}
   magnetismSpec: {fileID: 11400000, guid: b6ed92d16c3ecd142a61e6bc86e80f86, type: 2}
-  aiSpec: {fileID: 0}
   acceleration: 30
   drag: 3
   dragCurve:
@@ -47,7 +46,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   velocityMultiplierForDrag: 0.61
   turnSpeed: 0.1
-  maxHealth: 4
+  initialHealth: 20
   debrisDropped:
     min: 0
     max: 10

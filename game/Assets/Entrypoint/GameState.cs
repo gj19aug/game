@@ -19,6 +19,7 @@ public struct GameState
     public Dictionary<Refs, object> pools;
     public Collider2D[] colliderCache;
     public RefList<Impact> impactCache;
+    public List<Vector3> lastImpactPositions;
 }
 
 [Serializable]
@@ -32,14 +33,14 @@ public struct ShipCommon
     public MoveState move;
     public ShipInput input;
     public RefList<Weapon> weapons;
-    public int health;
+    public float health;
 }
 
 [Serializable]
 public struct PlayerShip
 {
     public ShipCommon common;
-    public List<DebrisRefs> debris;
+    public RefList<AttachedDebris> debris;
 }
 
 [Serializable]
@@ -116,11 +117,33 @@ public struct Spawn
     public List<ShipRefs> ships;
 }
 
+[Serializable]
+public struct AttachedDebris
+{
+    public Pool<DebrisRefs> pool;
+    public DebrisRefs refs;
+    public float health;
+}
+
+public struct Layer
+{
+    public readonly int Index;
+    public readonly int Mask;
+
+    public Layer(string name)
+    {
+        Index = LayerMask.NameToLayer(name);
+        Mask = 1 << Index;
+    }
+}
+
 public static class Layers
 {
-    public static int Player = LayerMask.NameToLayer("Player");
-    public static int Enemy = LayerMask.NameToLayer("Enemy");
-    public static int Debris = LayerMask.NameToLayer("Debris");
-    public static int PlayerProjectile = LayerMask.NameToLayer("Player Projectile");
-    public static int EnemyProjectile = LayerMask.NameToLayer("Enemy Projectile");
+    public static readonly Layer Player = new Layer("Player");
+    public static readonly Layer Enemy = new Layer("Enemy");
+    public static readonly Layer Debris = new Layer("Debris");
+    public static readonly Layer PlayerProjectile = new Layer("Player Projectile");
+    public static readonly Layer EnemyProjectile = new Layer("Enemy Projectile");
+    public static readonly Layer Environment = new Layer("Environment");
+    public static readonly Layer Background = new Layer("Background");
 }

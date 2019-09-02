@@ -83,4 +83,9 @@ public class Pool<T> where T : MonoBehaviour
     {
         return active.Remove(instance);
     }
+
+    public void Add(T instance)
+    {
+        active.Add(instance);
+    }
 }

@@ -7,7 +7,7 @@ public class ShipSpec : ScriptableObject
     public ExplosionRefs explosionPrefab;
     public WeaponSpec weaponSpec;
     public MagnetismSpec magnetismSpec;
-    public AISpec aiSpec;
+    //public AISpec aiSpec;
 
     [Tooltip("Determines how fast the character will accelerate from a stop. Also increases top speed.")]
     [Range(0, 100)]
@@ -28,7 +28,7 @@ public class ShipSpec : ScriptableObject
     [Range(0, 1)]
     public float turnSpeed = 0.1f;
 
-    public int maxHealth = 4;
+    public int initialHealth = 4;
 
     //[MinMaxRange(0, 50)]
     public IntRange debrisDropped = new IntRange() { min = 0, max = 10};

@@ -100,10 +100,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 4603457641461434570}
   physicsTransform: {fileID: 490369626211553718}
-  collider: {fileID: 7304720554541506485}
+  collider: {fileID: 6965589422213878275}
   sprite: {fileID: 3092062353052357953}
-  shipSpec: {fileID: 11400000, guid: 87876dc39855ef94bad05fc6c8b6d819, type: 2}
-  magnetismSpec: {fileID: 11400000, guid: 730a610f27c1bb748953978155fd7064, type: 2}
 --- !u!82 &-7605439848484887810
 AudioSource:
   m_ObjectHideFlags: 0
@@ -211,7 +209,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3092062353052357954}
   - component: {fileID: 3092062353052357953}
-  - component: {fileID: 7304720554541506485}
+  - component: {fileID: 6965589422213878275}
   m_Layer: 8
   m_Name: Sprite
   m_TagString: Untagged
@@ -282,8 +280,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!60 &7304720554541506485
-PolygonCollider2D:
+--- !u!58 &6965589422213878275
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -296,23 +294,5 @@ PolygonCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.63870966, y: 1}
-    newSize: {x: 10.24, y: 10.24}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 0.31935483, y: 0.40967742}
-      - {x: 0.17741935, y: 0.5}
-      - {x: -0.22258064, y: 0.5}
-      - {x: -0.31935483, y: 0.3516129}
-      - {x: -0.31935483, y: -0.5}
-      - {x: -0.15806451, y: -0.5}
-      - {x: -0.14516129, y: -0.48064515}
-      - {x: -0.029032258, y: -0.5}
-      - {x: 0.31935483, y: -0.5}
+  serializedVersion: 2
+  m_Radius: 0.6

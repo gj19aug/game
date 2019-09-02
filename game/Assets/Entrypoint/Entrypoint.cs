@@ -43,7 +43,7 @@ public class Entrypoint : MonoBehaviour
         InitializePools(spec.explosionPrefab, count);
         InitializePools(spec.weaponSpec);
         InitializePools(spec.magnetismSpec);
-        InitializePools(spec.aiSpec);
+        //InitializePools(spec.aiSpec);
     }
 
     void InitializePools(WeaponSpec spec)
@@ -204,7 +204,7 @@ public class Entrypoint : MonoBehaviour
                 Vector3 aim = CalculateWeaponDirection(ship.move.look, weapon.aim);
 
                 ProjectileRefs pr = Spawn(spec.projectilePrefab);
-                int layer = isPlayer ? Layers.PlayerProjectile : Layers.EnemyProjectile;
+                int layer = isPlayer ? Layers.PlayerProjectile.Index : Layers.EnemyProjectile.Index;
                 pr.rigidbody.gameObject.layer = layer;
                 pr.collider.gameObject.layer = layer;
 
@@ -231,15 +231,74 @@ public class Entrypoint : MonoBehaviour
 
     void ProcessShipImpact(ref ShipCommon ship, ref Impact impact)
     {
-        bool isPlayer = ship.refs == state.player.common.refs;
+        ShipRefs player = state.player.common.refs;
+        bool isPlayer = ship.refs == player;
         if (isPlayer)
         {
-            // TODO: Implement
+            Profiler.BeginSample("Player Impact");
+            Assert.IsTrue(impact.owner != ship.refs);
+
+            // Players can't hit themselves
+            if (impact.owner == ship.refs) return;
+
+            int count = Physics2D.OverlapCircleNonAlloc(
+                impact.position,
+                impact.spec.damageRadius,
+                state.colliderCache,
+                Layers.Player.Mask);
+
+            if (count > 0) Debug.Log("Processing Hits");
+            for (int i = 0; i < count; i++)
+            {
+                Collider2D collider = state.colliderCache[i];
+
+                DebrisRefs dr = collider.GetComponentInParent<DebrisRefs>();
+                if (dr != null)
+                {
+                    for (int j = state.player.debris.Count - 1; j >= 0; j--)
+                    {
+                        ref AttachedDebris debris = ref state.player.debris[j];
+                        if (debris.refs != dr) continue;
+
+                        float dist = ((Vector3) collider.ClosestPoint(impact.position) - impact.position).magnitude;
+                        float damage = (dist / impact.spec.damageRadius) * impact.spec.damage;
+                        Assert.IsTrue(dist <= impact.spec.damageRadius + Mathf.Epsilon);
+
+                        Debug.LogFormat(collider, "Hit ({0})", debris.health - damage);
+
+                        debris.health -= damage;
+                        if (debris.health <= 0.0f)
+                        {
+                            // TODO: Having to destroy instead of disable is pretty lame.
+                            dr.rigidbody = dr.physicsTransform.gameObject.AddComponent<Rigidbody2D>();
+                            dr.rigidbody.gravityScale = 0.0f;
+                            dr.rigidbody.gameObject.layer = Layers.Environment.Index;
+                            dr.collider.gameObject.layer = Layers.Environment.Index;
+
+                            float impulse = Random.Range(0.5f, 1.5f) * 10.0f * damage;
+                            Vector3 impulseDir = (Vector3) dr.physicsTransform.position - ship.move.p;
+                            dr.rigidbody.AddForce(impulse * impulseDir, ForceMode2D.Impulse);
+                            dr.rigidbody.AddTorque(0.05f * impulse, ForceMode2D.Impulse);
+
+                            debris.pool.Add(dr);
+                            dr.transform.parent = debris.pool.root;
+                            state.player.debris.RemoveAt(j);
+                        }
+                    }
+                }
+                else if (collider == state.player.common.refs.collider)
+                {
+                    // TODO: Implement
+                    Debug.Log("Game Over!");
+                }
+            }
+            Profiler.EndSample();
         }
         else
         {
+            Profiler.BeginSample("Enemy Impact");
             ship.health -= impact.spec.damage;
-            if (ship.health <= 0)
+            if (ship.health <= 0.0f)
             {
                 ref EnemyShip e = ref FindEnemy(ship.refs);
                 ShipSpec spec = e.common.spec;
@@ -263,6 +322,7 @@ public class Entrypoint : MonoBehaviour
                     SpawnDebris(position, impulse, impulseDir);
                 }
             }
+            Profiler.EndSample();
         }
     }
 
@@ -272,7 +332,7 @@ public class Entrypoint : MonoBehaviour
         e.common.spec = spec;
         e.common.refs = Spawn(spec.shipPrefab);
         e.common.weapons = new RefList<Weapon>(2);
-        e.common.health = e.common.spec.maxHealth;
+        e.common.health = e.common.spec.initialHealth;
         e.common.move.p = position;
 
         AddWeapon(ref e.common, spec.weaponSpec, new Vector3(-1.0f, 0.0f, 0.0f));
@@ -367,6 +427,7 @@ public class Entrypoint : MonoBehaviour
 
         state.colliderCache = new Collider2D[32];
         state.impactCache = new RefList<Impact>(32);
+        state.lastImpactPositions = new List<Vector3>(8);
 
         state.projectiles = new List<Projectile>(128);
         state.impactEffects = new RefList<ImpactEffect>(128);
@@ -388,14 +449,15 @@ public class Entrypoint : MonoBehaviour
             state.player.common.spec = playerSpec;
             state.player.common.refs = Instantiate(playerSpec.shipPrefab);
             state.player.common.weapons = new RefList<Weapon>(2);
-            state.player.debris = new List<DebrisRefs>(128);
+            state.player.debris = new RefList<AttachedDebris>(128);
             AddWeapon(ref state.player.common, playerSpec.weaponSpec, new Vector3(-0.25f, 0.0f, 0.0f));
             AddWeapon(ref state.player.common, playerSpec.weaponSpec, new Vector3(+0.25f, 0.0f, 0.0f));
         }
 
-        // TODO: Spec for starting health
         // Spawn debris to initialize player health
-        for (int i = 0; i < 20; i++)
+        ref ShipCommon player = ref state.player.common;
+        player.health = playerSpec.initialHealth;
+        for (int i = 0; i < player.health; i++)
         {
             Vector3 position = 5.0f * Random.insideUnitCircle + Vector2.one;
             float impulse = 1.0f * Random.Range(0.5f, 1.5f);
@@ -464,6 +526,10 @@ public class Entrypoint : MonoBehaviour
                     impact.spec = p.spec;
                     impact.owner = p.owner;
                     impact.victim = victim;
+
+                    if (state.lastImpactPositions.Count == state.lastImpactPositions.Capacity)
+                        state.lastImpactPositions.RemoveAt(0);
+                    state.lastImpactPositions.Add(impact.position);
                     break;
                 }
             }
@@ -593,29 +659,51 @@ public class Entrypoint : MonoBehaviour
             MagnetismSpec mag = player.common.spec.magnetismSpec;
 
             // Attach debris that's touching the player
-            int attachCount = refs.rigidbody.GetContacts(state.colliderCache);
+            Profiler.BeginSample("Magnetism Attach");
+            var filter = new ContactFilter2D();
+            //filter.useLayerMask = true;
+            filter.SetLayerMask(mag.affectedLayers);
+            int attachCount = refs.rigidbody.GetContacts(filter, state.colliderCache);
+
             for (int i = 0; i < attachCount; i++)
             {
                 Collider2D collider = state.colliderCache[i];
+
                 var dr = collider.GetComponentInParent<DebrisRefs>();
                 if (dr == null) continue;
 
+                // TODO: Could probably use Bounds
+                CircleCollider2D playerCollider = refs.collider as CircleCollider2D;
+                CircleCollider2D debrisCollider = collider as CircleCollider2D;
+                Assert.IsNotNull(playerCollider);
+                Assert.IsNotNull(debrisCollider);
+
                 Vector3 relPos = (Vector3) dr.rigidbody.position - move.p;
-                dr.transform.position = dr.transform.position - (mag.packing * relPos.normalized);
-                dr.transform.parent = refs.physicsTransform;
-                player.debris.Add(dr);
+                float distCur = relPos.magnitude;
+                float distTar = Mathf.Max(distCur - mag.packing, playerCollider.radius + debrisCollider.radius);
+                relPos *= distTar / distCur;
 
                 // TODO: Having to destroy instead of disable is pretty lame.
-                dr.rigidbody.gameObject.layer = Layers.Player;
-                dr.collider.gameObject.layer = Layers.Player;
+                dr.rigidbody.gameObject.layer = Layers.Player.Index;
+                dr.collider.gameObject.layer = Layers.Player.Index;
                 DestroyImmediate(dr.rigidbody);
                 dr.rigidbody = null;
 
-                Pool<DebrisRefs> pool = FindPool(dr);
-                pool.Remove(dr);
+                dr.physicsTransform.position = move.p + relPos;
+                dr.transform.parent = refs.physicsTransform;
+                player.common.health++;
+
+                ref AttachedDebris debris = ref player.debris.Add();
+                debris.refs = dr;
+                debris.health = 1;
+
+                debris.pool = FindPool(dr);
+                debris.pool.Remove(dr);
             }
+            Profiler.EndSample();
 
             // Apply force to nearby objects
+            Profiler.BeginSample("Magnetism Pull");
             int nearCount = Physics2D.OverlapCircleNonAlloc(
                 move.p,
                 mag.radius,
@@ -626,7 +714,6 @@ public class Entrypoint : MonoBehaviour
             {
                 Rigidbody2D rb = state.colliderCache[i].attachedRigidbody;
                 Vector3 relPos = (Vector3) rb.position - move.p;
-
                 float dist = relPos.magnitude;
 
                 // TODO: Depenetration?
@@ -634,6 +721,7 @@ public class Entrypoint : MonoBehaviour
                 Vector3 force = -relPos * (strength / dist);
                 rb.AddForce(force, ForceMode2D.Force);
             }
+            Profiler.EndSample();
         }
         Profiler.EndSample();
 
@@ -688,6 +776,15 @@ public class Entrypoint : MonoBehaviour
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(refs.rigidbody.position, mag.radius);
+        }
+
+        if (state.lastImpactPositions != null)
+        {
+            for (int i = 0; i < state.lastImpactPositions.Count; i++)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(state.lastImpactPositions[i], 0.2f);
+            }
         }
     }
     #endif

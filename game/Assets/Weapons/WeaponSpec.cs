@@ -22,4 +22,7 @@ public class WeaponSpec : ScriptableObject
 
     [Range(1, 100)]
     public int damage = 1;
+
+    [Range(0.1f, 5.0f)]
+    public float damageRadius = 0.2f;
 }
