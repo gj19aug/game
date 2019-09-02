@@ -4,6 +4,6 @@ public class ShipRefs : Refs
 {
     public new Rigidbody2D rigidbody;
     public Transform physicsTransform;
-    public new PolygonCollider2D collider;
+    public new Collider2D collider;
     public SpriteRenderer sprite;
 }

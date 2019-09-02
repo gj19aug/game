@@ -37,8 +37,10 @@ public class Entrypoint : MonoBehaviour
 
     void InitializePools(ShipSpec spec, bool isPlayer)
     {
-        InitializePools(spec.shipPrefab, 16);
-        InitializePools(spec.explosionPrefab, 16);
+        // TODO: Propagate to weapon spec
+        int count = isPlayer ? 1 : 16;
+        InitializePools(spec.shipPrefab, count);
+        InitializePools(spec.explosionPrefab, count);
         InitializePools(spec.weaponSpec);
         InitializePools(spec.magnetismSpec);
         InitializePools(spec.aiSpec);
@@ -143,7 +145,7 @@ public class Entrypoint : MonoBehaviour
 
     static void ProcessShipMovement(ref ShipCommon ship)
     {
-        ref ShipSpec spec = ref ship.spec;
+        ShipSpec spec = ship.spec;
         ref MoveState move = ref ship.move;
         ref ShipInput input = ref ship.input;
         Rigidbody2D rigidbody = ship.refs.rigidbody;
@@ -176,10 +178,11 @@ public class Entrypoint : MonoBehaviour
         return direction;
     }
 
-    void ProcessShipWeapons(ref ShipCommon ship, bool isPlayer)
+    void ProcessShipWeapons(ref ShipCommon ship)
     {
         float t = Time.fixedTime;
         ref ShipInput input = ref ship.input;
+        bool isPlayer = ship.refs == state.player.common.refs;
 
         for (int j = 0; j < ship.weapons.Count; j++)
         {
@@ -226,15 +229,10 @@ public class Entrypoint : MonoBehaviour
         input.aim = prevInput.aim;
     }
 
-    bool IsPlayerShip(ref ShipCommon ship)
-    {
-        ref ShipCommon player = ref state.player.common;
-        return EqualityComparer<ShipCommon>.Default.Equals(player, ship);
-    }
-
     void ProcessShipImpact(ref ShipCommon ship, ref Impact impact)
     {
-        if (IsPlayerShip(ref ship))
+        bool isPlayer = ship.refs == state.player.common.refs;
+        if (isPlayer)
         {
             // TODO: Implement
         }
@@ -529,7 +527,7 @@ public class Entrypoint : MonoBehaviour
         Profiler.BeginSample("Ship Update");
         ref PlayerShip player = ref state.player;
         ProcessShipMovement(ref player.common);
-        ProcessShipWeapons(ref player.common, true);
+        ProcessShipWeapons(ref player.common);
 
         for (int i = 0; i < state.enemies.Count; i++)
         {
@@ -553,7 +551,7 @@ public class Entrypoint : MonoBehaviour
             input.shoot = Vector2.Angle(move.look, input.aim) < 22;
 
             ProcessShipMovement(ref enemy.common);
-            ProcessShipWeapons(ref enemy.common, false);
+            ProcessShipWeapons(ref enemy.common);
         }
         Profiler.EndSample();
 
@@ -626,9 +624,7 @@ public class Entrypoint : MonoBehaviour
 
                 float dist = relPos.magnitude;
 
-                // NOTE: Object is inside the player. Skip it and let physics depenetrate it.
-                if (dist < refs.collider.Radius()) continue;
-
+                // TODO: Depenetration?
                 float strength = mag.strength * mag.strengthCurve.Evaluate(dist / mag.radius);
                 Vector3 force = -relPos * (strength / dist);
                 rb.AddForce(force, ForceMode2D.Force);
@@ -668,8 +664,8 @@ public class Entrypoint : MonoBehaviour
         if (state.player.common.refs == null) return;
 
         ref ShipCommon ship = ref state.player.common;
-        ref ShipRefs refs = ref state.player.common.refs;
-        ref MagnetismSpec mag = ref state.player.common.spec.magnetismSpec;
+        ShipRefs refs = state.player.common.refs;
+        MagnetismSpec mag = state.player.common.spec.magnetismSpec;
 
         if (EditorApplication.isPlaying)
         {

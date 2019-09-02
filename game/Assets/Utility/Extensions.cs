@@ -74,15 +74,3 @@ public static class Vector3Ex
         return v;
     }
 }
-
-public static class PolygonCollider2DEx
-{
-    public static float Radius(this PolygonCollider2D collider)
-    {
-        float radiusSq = 0.0f;
-        Vector2[] points = collider.points;
-        for (int i = 0; i < points.Length; i++)
-            radiusSq = Mathf.Max(radiusSq, points[i].sqrMagnitude);
-        return Mathf.Sqrt(radiusSq);
-    }
-}

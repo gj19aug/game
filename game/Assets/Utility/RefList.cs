@@ -9,6 +9,9 @@ public class RefList<T>
 	public int capacity;
 	public T[] items;
 
+	// Seriously, C#?
+	public EqualityComparer<T> comparer;
+
 	public ref T this[int index]
 	{
 		get { return ref items[index]; }
@@ -21,6 +24,7 @@ public class RefList<T>
 		count = 0;
 		this.capacity = capacity;
 		items = new T[capacity];
+		comparer = EqualityComparer<T>.Default;
 	}
 
 	public ref T Add()
@@ -52,7 +56,7 @@ public class RefList<T>
 		for (int i = 0; i < count; i++)
 		{
 			// Seriously, C#?
-			if (EqualityComparer<T>.Default.Equals(items[i], item))
+			if (comparer.Equals(items[i], item))
 			{
 				Array.Copy(items, i + 1, items, i, count - i - 1);
 				count -= 1;

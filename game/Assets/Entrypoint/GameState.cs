@@ -46,8 +46,6 @@ public struct EnemyShip
 {
     public ShipCommon common;
     public AISpec aiSpec;
-
-    // TODO: This is probably bad
     public ShipRefs target;
 }
 
