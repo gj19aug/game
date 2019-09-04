@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Magnetism_Basic
   m_EditorClassIdentifier: 
   radius: 10
-  strength: 200
+  strength: 400
   strengthCurve:
     serializedVersion: 2
     m_Curve:
@@ -38,7 +38,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  packing: 0.2
+  packing: 0.4
   affectedLayers:
     serializedVersion: 2
     m_Bits: 1024
