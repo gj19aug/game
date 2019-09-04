@@ -57,8 +57,8 @@ Just Finish the Damn Game
 ---------------------
 [ ] (Adam)  Lose State
 [ ] (Adam)  Win State
-[ ] (Adam)  Spawn debris from center of enemies
-[ ] (Adam)  Enemy going into debris
+[+] (Adam)  Spawn debris from center of enemies
+[+] (Adam)  Enemy going into debris
 [ ] (Adam)  Debris knockoff speed too fast
 [ ] (Adam)  Only player screen shake
 [ ] (Adam)  Spawn delay scaling

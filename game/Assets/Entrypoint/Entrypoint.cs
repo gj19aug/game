@@ -308,8 +308,8 @@ public class Entrypoint : MonoBehaviour
                 for (int i = 0; i < count; i++)
                 {
                     float impulse = spec.debrisImpulse * Random.Range(0.5f, 1.5f);
-                    Vector3 impulseDir = Random.insideUnitCircle;
-                    Vector3 position = e.common.move.p + (1.0f + spec.debrisRange) * impulseDir;
+                    Vector3 impulseDir = Random.insideUnitCircle.normalized;
+                    Vector3 position = e.common.move.p + spec.debrisRange * impulseDir;
                     SpawnDebris(position, impulse, impulseDir);
                 }
             }
@@ -427,7 +427,7 @@ public class Entrypoint : MonoBehaviour
         }
         player.radius = Mathf.Max(Mathf.Sqrt(maxDistSq) + radius);
         #else
-        player.radius += Mathf.Sqrt(0.005f * player.debris.Count);
+        player.radius += Mathf.Sqrt(0.05f * player.debris.Count);
         #endif
     }
 
@@ -641,11 +641,11 @@ public class Entrypoint : MonoBehaviour
             input.point = targetP;
             input.aim = toTarget.normalized;
 
-            Vector3 desiredP = targetP - (5.0f * toTarget.normalized);
+            Vector3 desiredP = targetP - ((5.0f + player.radius) * toTarget.normalized);
             Vector3 toDesired = desiredP - move.p;
 
             float distToDesired = toDesired.magnitude;
-            float throttle = Mathf.Lerp(0, 1, (distToDesired - 0.75f) / 3.0f);
+            float throttle = Mathf.Lerp(0, 1, (distToDesired - 0.5f) / 1.0f);
 
             input.throttle = (throttle / distToDesired) * toDesired;
             input.shoot = Vector2.Angle(move.look, input.aim) < 22;
@@ -660,8 +660,6 @@ public class Entrypoint : MonoBehaviour
         // TODO: Should the camera have a rigidbody for movement interpolation?
         camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
         camera.camera.orthographicSize = 7.0f + Mathf.Sqrt(0.05f * player.common.refs.physicsTransform.childCount);
-        //Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-        //Debug.Log("Debris Attached to ship: " + player.common.refs.physicsTransform.childCount);
         Profiler.EndSample();
 
         // TODO: Horribly inefficient

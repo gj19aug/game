@@ -83,5 +83,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  debrisRange: 0.5
-  debrisImpulse: 5
+  debrisRange: 0.25
+  debrisImpulse: 6
