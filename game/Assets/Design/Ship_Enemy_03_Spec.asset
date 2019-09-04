@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78a5a8a230c5632408a46088ba384fb1, type: 3}
-  m_Name: Ship_Enemy_02_Spec
+  m_Name: Ship_Enemy_03_Spec
   m_EditorClassIdentifier: 
-  shipPrefab: {fileID: -2299728369730618024, guid: 4dc8b938d00b8754a8b689787c6ce1c1,
+  shipPrefab: {fileID: 4573865440716102233, guid: 634b8c2ca504ffa488e73b0cd6cbd3e2,
     type: 3}
   explosionPrefab: {fileID: 1099061329349664048, guid: a4a9ad99ca01ed0448e6951e2401f745,
     type: 3}
@@ -27,16 +27,16 @@ MonoBehaviour:
       time: 0
       value: 0
       inSlope: 0
-      outSlope: 0
+      outSlope: 1
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.5541687
-      value: 0.98349
+      time: 1
+      value: 1
       inSlope: 1
-      outSlope: 1
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -46,9 +46,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   velocityMultiplierForDrag: 0.03
   turnSpeed: 0.1
-  initialHealth: 30
+  initialHealth: 45
   debrisDropped:
-    min: 2
+    min: 0
     max: 10
   debrisDistribution:
     serializedVersion: 2

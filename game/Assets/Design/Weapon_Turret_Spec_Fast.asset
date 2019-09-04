@@ -19,7 +19,8 @@ MonoBehaviour:
   impactPrefab: {fileID: 6427970028925150938, guid: db9fcde46778fa54590ea53fb96cd4fc,
     type: 3}
   refireDelay: 0.25
-  impulse: 12
+  impulse: 14
   lifetime: 3
   turnSpeed: 0.2
-  damage: 1
+  damage: 3
+  damageRadius: 0.2
