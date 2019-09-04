@@ -2,11 +2,9 @@
 
 public class ResumeButton : MonoBehaviour
 {
-    public static bool GameIsPaused;
-
     public void ResumeGame()
     {
-        GameIsPaused = false;
+        PauseMenu.IsGamePaused = false;
         Time.timeScale = 1f;
     }
 }

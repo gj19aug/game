@@ -531,6 +531,14 @@ public class Entrypoint : MonoBehaviour
 
     void FixedUpdate()
     {
+        // BUG: Camera size is wrong on restart
+        // NOTE: This is bad and I feel bad.
+        if (PauseMenu.IsStartMenuActive)
+        {
+            Time.timeScale = 0.0f;
+            return;
+        }
+
         // NOTE: Simulate!
 
         float t = Time.fixedTime;

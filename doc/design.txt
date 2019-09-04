@@ -64,13 +64,13 @@ Just Finish the Damn Game
 [+] (Adam)  Spawn delay scaling
 [ ] (Adam)  Enemy random offset for follow distance
 [ ] (Adam)  Multiple fire points?
-[ ] (Chris) Menus
+[+] (Chris) Menus
 [ ] (Corey) Encounter Design
-[ ] (Corey) Missile redesign
-[ ] (Mike)  Crosshair easy to lose
-[ ] (Mike)  Art Iteration
-[ ] (Mike)  No Pre-Warm Particles
-[ ] (Mike)  Projectiles displaying over debris
+[+] (Corey) Missile redesign
+[+] (Mike)  Crosshair easy to lose
+[+] (Mike)  Art Iteration
+[+] (Mike)  No Pre-Warm Particles
+[+] (Mike)  Projectiles displaying over debris
 [ ] (????)  Sluggish when large
 
 

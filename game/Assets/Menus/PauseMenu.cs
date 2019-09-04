@@ -2,17 +2,24 @@
 
 public class PauseMenu : MonoBehaviour
 {
-    public static bool GameIsPaused = false;
+    public static bool IsGamePaused = false;
+    public static bool IsStartMenuActive = false;
+    public static bool IsHowToActive = false;
 
     public GameObject PauseMenuUI;
-
-
+    public GameObject StartMenuUI;
+    public GameObject HowToPlayUI;
 
     void Update()
     {
+        IsStartMenuActive = StartMenuUI.activeInHierarchy;
+        IsHowToActive = HowToPlayUI.activeInHierarchy;
+        if (IsStartMenuActive) return;
+        if (IsHowToActive) return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameIsPaused)
+            if (IsGamePaused)
             {
                 Resume();
             }
@@ -27,13 +34,13 @@ public class PauseMenu : MonoBehaviour
     {
         PauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
-        GameIsPaused = false;
+        IsGamePaused = false;
     }
 
     void Pause()
     {
         PauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
-        GameIsPaused = true;
+        IsGamePaused = true;
     }
 }
