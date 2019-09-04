@@ -150,5 +150,3 @@ public static class Layers
     public static readonly Layer Environment = new Layer("Environment");
     public static readonly Layer Background = new Layer("Background");
 }
-
-public static bool GameIsPaused = false;
