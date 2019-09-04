@@ -48,8 +48,8 @@ MonoBehaviour:
   turnSpeed: 0.1
   initialHealth: 30
   debrisDropped:
-    min: 2
-    max: 10
+    min: 10
+    max: 16
   debrisDistribution:
     serializedVersion: 2
     m_Curve:

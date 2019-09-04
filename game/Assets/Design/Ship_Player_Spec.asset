@@ -46,7 +46,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   velocityMultiplierForDrag: 0.61
   turnSpeed: 0.1
-  initialHealth: 20
+  initialHealth: 100
   debrisDropped:
     min: 0
     max: 10
