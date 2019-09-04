@@ -33,28 +33,50 @@ Mechanics
 
 1.0
 ---------------------
-[ ] (Adam)  Environment Collision
-[ ] (Adam)  Player Health
+[+] (Adam)  Player Health
+[+] (Adam)  Player Initial Health
 [ ] (Adam)  Lose State
-[ ] (Adam)  Player Initial Health
-[ ] (Adam)  Dynamic Turrets
+[ ] (Adam)  Win State
+[ ] (Corey) Encounter Design
 [ ] (Adam)  Improve Debris Magnetism (Prevent Orbits)
-[ ] (Adam)  Magnetism Radius Needs to Scale
-[ ] (Adam)  Debris Cleanup
 [ ] (Adam)  Mass Encumberance
 [ ] (Adam)  Free Floating Debris
+[+] (Chris) SFX
+[~] (Chris) Menus
+[+] {Corey) Walls
+[+] (Mike)  Screen Shake
+[ ] (Adam)  Environment Collision
 [ ] (Adam)  Player-Enemy Collision
-[ ] (Chris) SFX
+[ ] (Mike)  Prototype a Black Hole
+[ ] (Adam)  Debris Cleanup
+[ ] (Adam)  Magnetism Radius Needs to Scale
+[ ] (Adam)  Dynamic Turrets
+
+
+Just Finish the Damn Game
+---------------------
+[ ] (Adam)  Lose State
+[ ] (Adam)  Win State
+[ ] (Adam)  Spawn debris from center of enemies
+[ ] (Adam)  Enemy going into debris
+[ ] (Adam)  Debris knockoff speed too fast
+[ ] (Adam)  Only player screen shake
+[ ] (Adam)  Spawn delay scaling
+[ ] (Adam)  Enemy random offset for follow distance
+[ ] (Adam)  Multiple fire points?
 [ ] (Chris) Menus
 [ ] (Corey) Encounter Design
-[ ] {Corey) Walls
-[ ] (Mike)  Screen Shake
-[ ] (Mike)  Prototype a Black Hole
+[ ] (Corey) Missile redesign
+[ ] (Mike)  Crosshair easy to lose
+[ ] (Mike)  Art Iteration
+[ ] (Mike)  No Pre-Warm Particles
+[ ] (Mike)  Projectiles displaying over debris
+[ ] (????)  Sluggish when large
 
 
 Mechanics (Ordered)
 ---------------------
-[ ] Weapon Types (Rockets, Projectiles, Jettison Parts)
+[+] Weapon Types (Rockets, Projectiles, Jettison Parts)
 [ ] Engine Types
 [ ] Armor (Heavy Pieces)
 [ ] Shields (Energy Sphere, Cone, Orbiting Debris)
@@ -68,7 +90,7 @@ Mechanics (Ordered)
 [ ] Debug Cheat - Add / Remove Weapons
 [ ] Debug Cheat - Add / Remove Engines
 [ ] Debug Cheat - Spawn Enemy
-[ ] Debug Cheat - Spawn Debris
+[+] Debug Cheat - Spawn Debris
 [+] Pause Menu
 [ ] Dynamic Thrusters
 [ ] Rotational Control
