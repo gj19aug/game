@@ -61,7 +61,7 @@ Just Finish the Damn Game
 [+] (Adam)  Enemy going into debris
 [+] (Adam)  Debris knockoff speed too fast
 [+] (Adam)  Only player screen shake
-[ ] (Adam)  Spawn delay scaling
+[+] (Adam)  Spawn delay scaling
 [ ] (Adam)  Enemy random offset for follow distance
 [ ] (Adam)  Multiple fire points?
 [ ] (Chris) Menus

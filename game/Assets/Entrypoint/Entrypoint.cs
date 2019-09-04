@@ -284,7 +284,7 @@ public class Entrypoint : MonoBehaviour
                 else if (collider == state.player.common.refs.collider)
                 {
                     // TODO: Implement
-                    Debug.Log("Game Over!");
+                    //Debug.Log("Game Over!");
 
                     // TODO: Enable once lose condition is implemented
                     // Big Camera shake
@@ -470,7 +470,7 @@ public class Entrypoint : MonoBehaviour
             SpawnRefs refs = enemySpawns[i];
             ref Spawn spawn = ref state.enemySpawns[i];
             spawn.refs = refs;
-            spawn.nextSpawnTime = t + refs.spec.timeBetweenSpawns;
+            spawn.nextSpawnTime = t + 1.0f + refs.spec.timeBetweenSpawns[0];
             spawn.ships = new List<ShipRefs>(refs.spec.maxCount);
         }
 
@@ -744,7 +744,7 @@ public class Entrypoint : MonoBehaviour
             Profiler.BeginSample("Magnetism Pull");
             int nearCount = Physics2D.OverlapCircleNonAlloc(
                 playerMove.p,
-                mag.radius,
+                mag.radius + player.radius,
                 state.colliderCache,
                 mag.affectedLayers);
 
@@ -776,11 +776,31 @@ public class Entrypoint : MonoBehaviour
                     if (t >= spawn.nextSpawnTime)
                     {
                         // BUG: Floating point issues for large t
-                        spawn.nextSpawnTime += spec.timeBetweenSpawns;
+                        float timeStep = spec.timeToMaxSpawnRate / (spec.timeBetweenSpawns.Length - 1);
+                        int spawnRateIndex = Mathf.FloorToInt(t / timeStep);
+                        spawnRateIndex = Mathf.Min(spawnRateIndex, spec.timeBetweenSpawns.Length - 1);
+                        spawn.nextSpawnTime += spec.timeBetweenSpawns[spawnRateIndex];
                         Vector3 pos = spawn.refs.transform.position + (Vector3) (5.0f * Random.insideUnitCircle);
-                        // TODO: Weighted random
-                        ShipSpawnSpec enemySpawn = RandomEx.Element(spec.ships);
-                        ref EnemyShip e = ref SpawnEnemy(enemySpawn.spec, pos);
+                        // HACK: Shitty weighted random
+                        ShipSpec enemySpec = null;
+                        {
+                            float totalProbability = 0.0f;
+                            for (int j = 0; j < spec.ships.Length; j++)
+                                totalProbability += spec.ships[j].probability;
+                            float random = Random.Range(0.0f, totalProbability);
+
+                            totalProbability = 0.0f;
+                            for (int j = 0; j < spec.ships.Length; j++)
+                            {
+                                totalProbability += spec.ships[j].probability;
+                                if (random <= totalProbability)
+                                {
+                                    enemySpec = spec.ships[j].spec;
+                                    break;
+                                }
+                            }
+                        }
+                        ref EnemyShip e = ref SpawnEnemy(enemySpec, pos);
                         spawn.ships.Add(e.common.refs);
                     }
                 }

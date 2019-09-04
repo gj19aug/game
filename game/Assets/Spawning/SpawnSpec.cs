@@ -14,6 +14,9 @@ public struct ShipSpawnSpec
 public class SpawnSpec : ScriptableObject
 {
     public int maxCount = 5;
-    public float timeBetweenSpawns = 0.4f;
+    public float timeToMaxSpawnRate = 45.0f;
+    [Range(0.0f, 10.0f)]
+    public float[] timeBetweenSpawns = new float[] { 1.0f };
+
     public ShipSpawnSpec[] ships;
 }

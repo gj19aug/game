@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Spawn_Enemy_Boss
   m_EditorClassIdentifier: 
   maxCount: 3
-  timeBetweenSpawns: 15
+  timeToMaxSpawnRate: 45
+  timeBetweenSpawns:
+  - 15
   ships:
-  - probability: 0
+  - probability: 1
     spec: {fileID: 11400000, guid: 8a44a09b0e3c6b14b8d8206443f24a08, type: 2}

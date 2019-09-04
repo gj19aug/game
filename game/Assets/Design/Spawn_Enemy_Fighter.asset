@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Spawn_Enemy_Fighter
   m_EditorClassIdentifier: 
   maxCount: 5
-  timeBetweenSpawns: 0.1
+  timeToMaxSpawnRate: 45
+  timeBetweenSpawns:
+  - 0.1
   ships:
-  - probability: 0
+  - probability: 1
     spec: {fileID: 11400000, guid: 0f6afc3a3e429094694325f59c56e6cb, type: 2}
