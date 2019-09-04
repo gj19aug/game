@@ -536,6 +536,10 @@ public class Entrypoint : MonoBehaviour
         float t = Time.fixedTime;
         float dt = Time.fixedDeltaTime;
 
+        ShipRefs playerRefs = state.player.common.refs;
+        ref PlayerShip player = ref state.player;
+        ref MoveState playerMove = ref state.player.common.move;
+
         // Projectile Impacts
         Profiler.BeginSample("Projectile Impacts");
         for (int i = state.projectiles.Count - 1; i >= 0 ; i--)
@@ -630,7 +634,6 @@ public class Entrypoint : MonoBehaviour
         Profiler.EndSample();
 
         Profiler.BeginSample("Ship Update");
-        ref PlayerShip player = ref state.player;
         ProcessShipMovement(ref player.common);
         ProcessShipWeapons(ref player.common);
 
@@ -662,9 +665,13 @@ public class Entrypoint : MonoBehaviour
 
         // Camera
         Profiler.BeginSample("Camera Update");
-        // TODO: Should the camera have a rigidbody for movement interpolation?
-        camera.transform.position = Vector3.Lerp(camera.transform.position, player.common.move.p, camera.spec.lerpFactor);
-        camera.camera.orthographicSize = 7.0f + Mathf.Sqrt(0.05f * player.common.refs.physicsTransform.childCount);
+        {
+            CameraSpec spec = camera.spec;
+
+            // TODO: Should the camera have a rigidbody for movement interpolation?
+            camera.transform.position = Vector3.Lerp(camera.transform.position, playerMove.p, spec.lerpFactor);
+            camera.camera.orthographicSize = spec.baseSize + Mathf.Sqrt(spec.sizeScaleRate * playerRefs.physicsTransform.childCount);
+        }
         Profiler.EndSample();
 
         // TODO: Horribly inefficient
@@ -686,8 +693,6 @@ public class Entrypoint : MonoBehaviour
         // Magnetism
         Profiler.BeginSample("Magnetism Update");
         {
-            ref MoveState move = ref state.player.common.move;
-            ShipRefs refs = player.common.refs;
             MagnetismSpec mag = player.common.spec.magnetismSpec;
 
             // Attach debris that's touching the player
@@ -695,7 +700,7 @@ public class Entrypoint : MonoBehaviour
             var filter = new ContactFilter2D();
             //filter.useLayerMask = true;
             filter.SetLayerMask(mag.affectedLayers);
-            int attachCount = refs.rigidbody.GetContacts(filter, state.colliderCache);
+            int attachCount = playerRefs.rigidbody.GetContacts(filter, state.colliderCache);
 
             for (int i = 0; i < attachCount; i++)
             {
@@ -705,12 +710,12 @@ public class Entrypoint : MonoBehaviour
                 if (dr == null) continue;
 
                 // TODO: Could probably use Bounds
-                CircleCollider2D playerCollider = refs.collider as CircleCollider2D;
+                CircleCollider2D playerCollider = playerRefs.collider as CircleCollider2D;
                 CircleCollider2D debrisCollider = collider as CircleCollider2D;
                 Assert.IsNotNull(playerCollider);
                 Assert.IsNotNull(debrisCollider);
 
-                Vector3 relPos = (Vector3) dr.rigidbody.position - move.p;
+                Vector3 relPos = (Vector3) dr.rigidbody.position - playerMove.p;
                 float distCur = relPos.magnitude;
                 float distTar = Mathf.Max(distCur - mag.packing, playerCollider.radius + debrisCollider.radius);
                 relPos *= distTar / distCur;
@@ -721,8 +726,8 @@ public class Entrypoint : MonoBehaviour
                 DestroyImmediate(dr.rigidbody);
                 dr.rigidbody = null;
 
-                dr.physicsTransform.position = move.p + relPos;
-                dr.transform.parent = refs.physicsTransform;
+                dr.physicsTransform.position = playerMove.p + relPos;
+                dr.transform.parent = playerRefs.physicsTransform;
                 player.common.health++;
                 RecalculatePlayerRadius();
 
@@ -738,7 +743,7 @@ public class Entrypoint : MonoBehaviour
             // Apply force to nearby objects
             Profiler.BeginSample("Magnetism Pull");
             int nearCount = Physics2D.OverlapCircleNonAlloc(
-                move.p,
+                playerMove.p,
                 mag.radius,
                 state.colliderCache,
                 mag.affectedLayers);
@@ -746,7 +751,7 @@ public class Entrypoint : MonoBehaviour
             for (int i = 0; i < nearCount; i++)
             {
                 Rigidbody2D rb = state.colliderCache[i].attachedRigidbody;
-                Vector3 relPos = (Vector3) rb.position - move.p;
+                Vector3 relPos = (Vector3) rb.position - playerMove.p;
                 float dist = relPos.magnitude;
 
                 // TODO: Depenetration?
@@ -789,13 +794,12 @@ public class Entrypoint : MonoBehaviour
             ref ShipInput input = ref player.common.input;
             if (input.cheatHealth)
             {
-                ref MoveState move = ref state.player.common.move;
                 for (int j = 0; j < 10; j++)
                 {
                     Vector3 relPos = Random.insideUnitCircle;
                     relPos = 4.0f * relPos + (player.radius + 1.0f) * relPos.normalized;
                     float impulse = 1.0f * Random.Range(0.5f, 1.5f);
-                    SpawnDebris(move.p + relPos, impulse, -relPos);
+                    SpawnDebris(playerMove.p + relPos, impulse, -relPos);
                 }
             }
         }
