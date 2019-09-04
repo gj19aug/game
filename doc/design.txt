@@ -59,8 +59,8 @@ Just Finish the Damn Game
 [ ] (Adam)  Win State
 [+] (Adam)  Spawn debris from center of enemies
 [+] (Adam)  Enemy going into debris
-[ ] (Adam)  Debris knockoff speed too fast
-[ ] (Adam)  Only player screen shake
+[+] (Adam)  Debris knockoff speed too fast
+[+] (Adam)  Only player screen shake
 [ ] (Adam)  Spawn delay scaling
 [ ] (Adam)  Enemy random offset for follow distance
 [ ] (Adam)  Multiple fire points?

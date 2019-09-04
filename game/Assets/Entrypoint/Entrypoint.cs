@@ -252,6 +252,10 @@ public class Entrypoint : MonoBehaviour
                         ref AttachedDebris debris = ref state.player.debris[j];
                         if (debris.refs != dr) continue;
 
+                        // Camera shake
+                        Vector3 camPos = camera.transform.localPosition;
+                        camera.transform.localPosition = camPos + Random.insideUnitSphere * 0.15f;
+
                         float dist = ((Vector3) collider.ClosestPoint(impact.position) - impact.position).magnitude;
                         float damage = Mathf.Lerp(0, impact.spec.damage, 1.0f - (dist / impact.spec.damageRadius));
                         Assert.IsTrue(dist <= impact.spec.damageRadius + Mathf.Epsilon);
@@ -265,10 +269,10 @@ public class Entrypoint : MonoBehaviour
                             dr.rigidbody.gameObject.layer = Layers.Background.Index;
                             dr.collider.gameObject.layer = Layers.Background.Index;
 
-                            float impulse = Random.Range(0.5f, 1.5f) * 10.0f * damage;
+                            float impulse = Random.Range(0.5f, 1.5f) * 3.0f * damage;
                             Vector3 impulseDir = (Vector3) dr.physicsTransform.position - ship.move.p;
                             dr.rigidbody.AddForce(impulse * impulseDir, ForceMode2D.Impulse);
-                            dr.rigidbody.AddTorque(0.05f * impulse, ForceMode2D.Impulse);
+                            dr.rigidbody.AddTorque(0.1f * impulse, ForceMode2D.Impulse);
 
                             debris.pool.Add(dr);
                             dr.transform.parent = debris.pool.root;
@@ -281,6 +285,11 @@ public class Entrypoint : MonoBehaviour
                 {
                     // TODO: Implement
                     Debug.Log("Game Over!");
+
+                    // TODO: Enable once lose condition is implemented
+                    // Big Camera shake
+                    //Vector3 camPos = camera.transform.localPosition;
+                    //camera.transform.localPosition = camPos + Random.insideUnitSphere * 1.00f;
                 }
             }
             Profiler.EndSample();
@@ -615,10 +624,6 @@ public class Entrypoint : MonoBehaviour
                 effect.refs.transform.position = impact.position;
                 effect.refs.transform.rotation = Random.rotation;
                 effect.lifetime = 0.7f;
-
-                // Cam shake test
-                Vector3 camPos = camera.transform.localPosition;
-                camera.transform.localPosition = camPos + Random.insideUnitSphere * 0.15f;
             }
         }
         state.impactCache.Clear();
