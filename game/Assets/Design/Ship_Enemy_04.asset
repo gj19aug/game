@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a5a8a230c5632408a46088ba384fb1, type: 3}
+  m_Name: Ship_Enemy_04
+  m_EditorClassIdentifier: 
+  shipPrefab: {fileID: 615674696627403725, guid: e33cd80921345d14298650caada53988,
+    type: 3}
+  explosionPrefab: {fileID: 1099061329349664048, guid: a4a9ad99ca01ed0448e6951e2401f745,
+    type: 3}
+  weaponSpec: {fileID: 11400000, guid: 36d0a449e4e4d9848a055f4054aeb8b4, type: 2}
+  magnetismSpec: {fileID: 11400000, guid: c890f98be33c0094bbbf192b47e10319, type: 2}
+  acceleration: 50
+  drag: 4
+  dragCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  velocityMultiplierForDrag: 0.2
+  turnSpeed: 0
+  initialHealth: 4
+  debrisDropped:
+    min: 2
+    max: 5
+  debrisDistribution:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  debrisRange: 0.5
+  debrisImpulse: 5
