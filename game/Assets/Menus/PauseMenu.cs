@@ -2,24 +2,21 @@
 
 public class PauseMenu : MonoBehaviour
 {
-    public static bool IsGamePaused = false;
-    public static bool IsStartMenuActive = false;
-    public static bool IsHowToActive = false;
-
     public GameObject PauseMenuUI;
     public GameObject StartMenuUI;
     public GameObject HowToPlayUI;
 
     void Update()
     {
-        IsStartMenuActive = StartMenuUI.activeInHierarchy;
-        IsHowToActive = HowToPlayUI.activeInHierarchy;
-        if (IsStartMenuActive) return;
-        if (IsHowToActive) return;
+        if (StartMenuUI.activeInHierarchy) Entrypoint.metaState = MetaState.StartMenu;
+        if (HowToPlayUI.activeInHierarchy) Entrypoint.metaState = MetaState.HowToMenu;
+
+        if (Entrypoint.metaState != MetaState.Gameplay &&
+            Entrypoint.metaState != MetaState.Paused) return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (IsGamePaused)
+            if (Entrypoint.metaState == MetaState.Paused)
             {
                 Resume();
             }
@@ -32,15 +29,15 @@ public class PauseMenu : MonoBehaviour
 
     void Resume()
     {
-        PauseMenuUI.SetActive(false);
+        Entrypoint.metaState = MetaState.Gameplay;
         Time.timeScale = 1f;
-        IsGamePaused = false;
+        PauseMenuUI.SetActive(false);
     }
 
     void Pause()
     {
-        PauseMenuUI.SetActive(true);
+        Entrypoint.metaState = MetaState.Paused;
         Time.timeScale = 0f;
-        IsGamePaused = true;
+        PauseMenuUI.SetActive(true);
     }
 }

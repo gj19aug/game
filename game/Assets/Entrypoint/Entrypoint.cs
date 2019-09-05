@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -15,6 +16,7 @@ public class Entrypoint : MonoBehaviour
 
     // Game State
     private GameState state;
+    public static MetaState metaState;
 
     // ---------------------------------------------------------------------------------------------
     // Object Pooling
@@ -263,19 +265,8 @@ public class Entrypoint : MonoBehaviour
                         debris.health -= damage;
                         if (debris.health <= 0.0f)
                         {
-                            // TODO: Having to destroy instead of disable is pretty lame.
-                            dr.rigidbody = dr.physicsTransform.gameObject.AddComponent<Rigidbody2D>();
-                            dr.rigidbody.gravityScale = 0.0f;
-                            dr.rigidbody.gameObject.layer = Layers.Background.Index;
-                            dr.collider.gameObject.layer = Layers.Background.Index;
-
-                            float impulse = Random.Range(0.5f, 1.5f) * 3.0f * damage;
-                            Vector3 impulseDir = (Vector3) dr.physicsTransform.position - ship.move.p;
-                            dr.rigidbody.AddForce(impulse * impulseDir, ForceMode2D.Impulse);
-                            dr.rigidbody.AddTorque(0.1f * impulse, ForceMode2D.Impulse);
-
-                            debris.pool.Add(dr);
-                            dr.transform.parent = debris.pool.root;
+                            DetachDebris(ref debris, ref ship, damage);
+                            state.player.common.health--;
                             state.player.debris.RemoveAt(j);
                             RecalculatePlayerRadius();
                         }
@@ -283,13 +274,9 @@ public class Entrypoint : MonoBehaviour
                 }
                 else if (collider == state.player.common.refs.collider)
                 {
-                    // TODO: Implement
-                    //Debug.Log("Game Over!");
-
-                    // TODO: Enable once lose condition is implemented
-                    // Big Camera shake
-                    //Vector3 camPos = camera.transform.localPosition;
-                    //camera.transform.localPosition = camPos + Random.insideUnitSphere * 1.00f;
+                    // NOTE: Has to be a *direct* impact
+                    if (impact.collider == ship.refs.collider)
+                        StartCoroutine(GameOver(impact.spec.damage));
                 }
             }
             Profiler.EndSample();
@@ -412,6 +399,43 @@ public class Entrypoint : MonoBehaviour
         debris.rigidbody.AddTorque(0.05f * impulse, ForceMode2D.Impulse);
     }
 
+    void AttachDebris(ref AttachedDebris debris, ref ShipCommon ship, Vector3 relPos)
+    {
+        DebrisRefs dr = debris.refs;
+
+        // TODO: Having to destroy instead of disable is pretty lame.
+        dr.rigidbody.gameObject.layer = Layers.Player.Index;
+        dr.collider.gameObject.layer = Layers.Player.Index;
+        DestroyImmediate(dr.rigidbody);
+        dr.rigidbody = null;
+
+        dr.physicsTransform.position = ship.move.p + relPos;
+        dr.transform.parent = ship.refs.physicsTransform;
+
+        debris.health = 1;
+        debris.pool = FindPool(dr);
+        debris.pool.Remove(dr);
+    }
+
+    void DetachDebris(ref AttachedDebris debris, ref ShipCommon ship, float damage)
+    {
+        DebrisRefs dr = debris.refs;
+
+        // TODO: Having to destroy instead of disable is pretty lame.
+        dr.rigidbody = dr.physicsTransform.gameObject.AddComponent<Rigidbody2D>();
+        dr.rigidbody.gravityScale = 0.0f;
+        dr.rigidbody.gameObject.layer = Layers.Background.Index;
+        dr.collider.gameObject.layer = Layers.Background.Index;
+
+        float impulse = Random.Range(0.5f, 1.5f) * 3.0f * damage;
+        Vector3 impulseDir = dr.physicsTransform.position - ship.move.p;
+        dr.rigidbody.AddForce(impulse * impulseDir, ForceMode2D.Impulse);
+        dr.rigidbody.AddTorque(0.1f * impulse, ForceMode2D.Impulse);
+
+        debris.pool.Add(dr);
+        dr.transform.parent = debris.pool.root;
+    }
+
     void RecalculatePlayerRadius()
     {
         ref PlayerShip player = ref state.player;
@@ -438,6 +462,40 @@ public class Entrypoint : MonoBehaviour
         #else
         player.radius += Mathf.Sqrt(0.05f * player.debris.Count);
         #endif
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // Game Flow
+
+    IEnumerator GameOver(float damage)
+    {
+        if (metaState == MetaState.GameLost) yield break;
+        metaState = MetaState.GameLost;
+
+        float startTime = Time.unscaledTime;
+
+        // Big Camera shake
+        Vector3 camPos = camera.transform.localPosition;
+        camera.transform.localPosition = camPos + Random.insideUnitSphere * 2.00f;
+
+        // Eject all ship debris
+        for (int i = 0; i < state.player.debris.Count; i++)
+            DetachDebris(ref state.player.debris[i], ref state.player.common, damage);
+        state.player.common.health = 0.0f;
+        state.player.debris.Clear();
+        RecalculatePlayerRadius();
+
+        // TODO: Spawn big explosion
+
+        float duration = 1.0f;
+        float nextTime = startTime + duration;
+        while (Time.unscaledTime < nextTime)
+        {
+            float normalizedTime = Mathf.Clamp01((nextTime - Time.unscaledTime) / duration);
+            Time.timeScale = normalizedTime;
+            yield return new WaitForSecondsRealtime(0.0f);
+        }
+        Time.timeScale = 0.0f;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -526,14 +584,17 @@ public class Entrypoint : MonoBehaviour
 
         // HACK: Reset
         if (Input.GetKeyDown(KeyCode.R))
+        {
+            Time.timeScale = 1.0f;
             SceneManager.LoadScene(0, LoadSceneMode.Single);
+        }
     }
 
     void FixedUpdate()
     {
         // BUG: Camera size is wrong on restart
-        // NOTE: This is bad and I feel bad.
-        if (PauseMenu.IsStartMenuActive)
+        // HACK: This is bad and I feel bad.
+        if (metaState == MetaState.StartMenu)
         {
             Time.timeScale = 0.0f;
             return;
@@ -548,8 +609,8 @@ public class Entrypoint : MonoBehaviour
         ref PlayerShip player = ref state.player;
         ref MoveState playerMove = ref state.player.common.move;
 
-        // Projectile Impacts
-        Profiler.BeginSample("Projectile Impacts");
+        // Find Projectile Impacts
+        Profiler.BeginSample("Find Projectile Impacts");
         for (int i = state.projectiles.Count - 1; i >= 0 ; i--)
         {
             Projectile p = state.projectiles[i];
@@ -573,6 +634,7 @@ public class Entrypoint : MonoBehaviour
                 {
                     ref Impact impact = ref state.impactCache.Add();
                     impact.position = contact.point;
+                    impact.collider = contact.collider;
                     impact.spec = p.spec;
                     impact.owner = p.owner;
                     impact.victim = victim;
@@ -728,23 +790,11 @@ public class Entrypoint : MonoBehaviour
                 float distTar = Mathf.Max(distCur - mag.packing, playerCollider.radius + debrisCollider.radius);
                 relPos *= distTar / distCur;
 
-                // TODO: Having to destroy instead of disable is pretty lame.
-                dr.rigidbody.gameObject.layer = Layers.Player.Index;
-                dr.collider.gameObject.layer = Layers.Player.Index;
-                DestroyImmediate(dr.rigidbody);
-                dr.rigidbody = null;
-
-                dr.physicsTransform.position = playerMove.p + relPos;
-                dr.transform.parent = playerRefs.physicsTransform;
                 player.common.health++;
-                RecalculatePlayerRadius();
-
                 ref AttachedDebris debris = ref player.debris.Add();
                 debris.refs = dr;
-                debris.health = 1;
-
-                debris.pool = FindPool(dr);
-                debris.pool.Remove(dr);
+                AttachDebris(ref debris, ref player.common, relPos);
+                RecalculatePlayerRadius();
             }
             Profiler.EndSample();
 
