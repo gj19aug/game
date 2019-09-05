@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ForceFieldShader
-  m_Shader: {fileID: -6465566751694194690, guid: 53fb2e7c10b7c274b994d8d5cd2fe70d,
+  m_Shader: {fileID: -6465566751694194690, guid: c202f7fb946a45b43b245947948c0f63,
     type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
   m_LightmapFlags: 4
@@ -70,7 +70,7 @@ Material:
     - Vector1_5C88AB: 0.09
     - Vector1_85CF784C: 2.94
     - Vector1_8E03EFBF: 0.05
-    - Vector1_C2C6E005: 0.19
+    - Vector1_C2C6E005: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
