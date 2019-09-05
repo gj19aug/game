@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Spawn_Enemy_Boss
   m_EditorClassIdentifier: 
   maxCount: 3
-  timeToMaxSpawnRate: 90
+  timeToMaxSpawnRate: 120
   timeBetweenSpawns:
   - 10
   - 9
