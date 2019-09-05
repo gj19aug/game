@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Camera_Basic
   m_EditorClassIdentifier: 
   lerpFactor: 0.09
-  baseSize: 8
+  baseSize: 10
   sizeScaleRate: 0.05
