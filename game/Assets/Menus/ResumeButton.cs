@@ -4,7 +4,7 @@ public class ResumeButton : MonoBehaviour
 {
     public void ResumeGame()
     {
-        PauseMenu.IsGamePaused = false;
+        Entrypoint.metaState = MetaState.Gameplay;
         Time.timeScale = 1f;
     }
 }
