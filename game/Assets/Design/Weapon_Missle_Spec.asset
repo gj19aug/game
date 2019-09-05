@@ -23,4 +23,4 @@ MonoBehaviour:
   lifetime: 5
   turnSpeed: 0.1
   damage: 3
-  damageRadius: 0.4
+  damageRadius: 0.8

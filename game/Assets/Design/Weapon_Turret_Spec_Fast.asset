@@ -22,5 +22,5 @@ MonoBehaviour:
   impulse: 18
   lifetime: 3
   turnSpeed: 0.1
-  damage: 8
+  damage: 7
   damageRadius: 0.2

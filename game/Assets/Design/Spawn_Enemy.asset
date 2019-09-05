@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Spawn_Enemy
   m_EditorClassIdentifier: 
   maxCount: 100
-  timeToMaxSpawnRate: 120
+  timeToMaxSpawnRate: 100
   timeBetweenSpawns:
-  - 10
-  - 8
+  - 9
+  - 7
   - 6
   - 4
   - 2
