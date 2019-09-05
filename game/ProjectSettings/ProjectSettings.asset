@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
-  productName: game
+  companyName: CCAM
+  productName: Smash Attraction
   defaultCursor: {fileID: 2800000, guid: 4162d6f8e08bc8545a4ab39613b5968b, type: 3}
   cursorHotspot: {x: 80, y: 85}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -120,7 +120,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 0.1
+  bundleVersion: 1.0.PreRelease.EarlyAccess
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -278,7 +278,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 0}
+      m_Icon: {fileID: 2800000, guid: 13d3644139f12014d9953e439c9362eb, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0
