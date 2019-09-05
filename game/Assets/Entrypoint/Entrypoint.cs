@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
+
 
 public class Entrypoint : MonoBehaviour
 {
@@ -15,12 +17,16 @@ public class Entrypoint : MonoBehaviour
     public SpawnRefs[] enemySpawns;
     public DebrisRefs[] debrisPrefabs;
 
+    public float surviveWinDuration;
     public GameObject startMenu;
     public GameObject startMenuTitle;
     public GameObject startMenuStart;
     public GameObject startMenuTryAgain;
     public GameObject startMenuGameLost;
+    public GameObject startMenuGameWon;
     public GameObject pauseMenu;
+    public GameObject hud;
+    public TextMeshProUGUI hudTimer;
 
     // Game State
     private GameState state;
@@ -28,12 +34,13 @@ public class Entrypoint : MonoBehaviour
     // ---------------------------------------------------------------------------------------------
     // Meta State
 
-    public static MetaState metaState { get; private set; } = MetaState.StartMenu;
+    public static MetaState metaState { get; private set; }
     private static Entrypoint instance;
 
     public static void SetMetaState(MetaState newState)
     {
-        if (newState == metaState) return;
+        //if (newState == metaState) return;
+        MetaState prevState = metaState;
         metaState = newState;
 
         switch (metaState)
@@ -41,11 +48,16 @@ public class Entrypoint : MonoBehaviour
             case MetaState.StartMenu:
             {
                 Time.timeScale = 1f;
-                SceneManager.LoadScene(0, LoadSceneMode.Single);
                 instance.playerShield.SetFloat("_DissolveValue", 0.0f);
                 instance.pauseMenu.SetActive(false);
-                instance = null;
-                gameOverRunning = false;
+                instance.hud.SetActive(false);
+                instance.hudTimer.SetText("{0:0.0}", instance.surviveWinDuration);
+                if (prevState != MetaState.StartMenu)
+                {
+                    SceneManager.LoadScene(0, LoadSceneMode.Single);
+                    instance = null;
+                    gameEnding = false;
+                }
                 break;
             }
 
@@ -58,6 +70,8 @@ public class Entrypoint : MonoBehaviour
             {
                 Time.timeScale = 1f;
                 instance.pauseMenu.SetActive(false);
+                instance.hud.SetActive(true);
+                instance.state.startTime = Time.fixedTime;
                 break;
             }
 
@@ -65,11 +79,13 @@ public class Entrypoint : MonoBehaviour
             {
                 Time.timeScale = 0f;
                 instance.pauseMenu.SetActive(true);
+                instance.hud.SetActive(false);
                 break;
             }
 
             case MetaState.GameLost:
             {
+                instance.hud.SetActive(false);
                 instance.startMenu.SetActive(true);
                 instance.startMenuTitle.SetActive(false);
                 instance.startMenuStart.SetActive(false);
@@ -80,6 +96,12 @@ public class Entrypoint : MonoBehaviour
 
             case MetaState.GameWon:
             {
+                instance.hud.SetActive(false);
+                instance.startMenu.SetActive(true);
+                instance.startMenuTitle.SetActive(false);
+                instance.startMenuStart.SetActive(false);
+                instance.startMenuTryAgain.SetActive(true);
+                instance.startMenuGameWon.SetActive(true);
                 break;
             }
         }
@@ -247,9 +269,8 @@ public class Entrypoint : MonoBehaviour
         return direction;
     }
 
-    void ProcessShipWeapons(ref ShipCommon ship)
+    void ProcessShipWeapons(ref ShipCommon ship, float t)
     {
-        float t = Time.fixedTime;
         ref ShipInput input = ref ship.input;
         bool isPlayer = ship.refs == state.player.common.refs;
 
@@ -343,7 +364,7 @@ public class Entrypoint : MonoBehaviour
                 {
                     // NOTE: Has to be a *direct* impact
                     if (impact.collider == ship.refs.collider)
-                        StartCoroutine(GameOver(impact.spec.damage));
+                        StartCoroutine(GameLost(impact.spec.damage));
                 }
             }
             Profiler.EndSample();
@@ -535,14 +556,33 @@ public class Entrypoint : MonoBehaviour
     // Game Flow
 
     // HACK: Terrible.
-    private static bool gameOverRunning;
+    private static bool gameEnding;
 
-    IEnumerator GameOver(float damage)
+    IEnumerator GameWon()
     {
-        if (gameOverRunning) yield break;
-        gameOverRunning = true;
+        if (gameEnding) yield break;
+        gameEnding = true;
 
+        instance.hudTimer.SetText("0.00");
+
+        float duration = 1.0f;
         float startTime = Time.unscaledTime;
+        float endTime = startTime + duration;
+        while (Time.unscaledTime < endTime)
+        {
+            float normalizedTime = Mathf.Clamp01((endTime - Time.unscaledTime) / duration);
+            Time.timeScale = normalizedTime;
+            yield return new WaitForSecondsRealtime(0.0f);
+        }
+        Time.timeScale = 0.0f;
+
+        SetMetaState(MetaState.GameWon);
+    }
+
+    IEnumerator GameLost(float damage)
+    {
+        if (gameEnding) yield break;
+        gameEnding = true;
 
         // Big Camera shake
         Vector3 camPos = camera.transform.localPosition;
@@ -558,10 +598,11 @@ public class Entrypoint : MonoBehaviour
         // TODO: Spawn big explosion
 
         float duration = 1.0f;
-        float nextTime = startTime + duration;
-        while (Time.unscaledTime < nextTime)
+        float startTime = Time.unscaledTime;
+        float endTime = startTime + duration;
+        while (Time.unscaledTime < endTime)
         {
-            float normalizedTime = Mathf.Clamp01((nextTime - Time.unscaledTime) / duration);
+            float normalizedTime = Mathf.Clamp01((endTime - Time.unscaledTime) / duration);
             Time.timeScale = normalizedTime;
             playerShield.SetFloat("_DissolveValue", 1.0f - normalizedTime);
             yield return new WaitForSecondsRealtime(0.0f);
@@ -579,9 +620,9 @@ public class Entrypoint : MonoBehaviour
     {
         // HACK: Mad hacks!
         instance = this;
-        instance.playerShield.SetFloat("_DissolveValue", 0.0f);
+        SetMetaState(MetaState.StartMenu);
 
-        float t = Time.fixedTime;
+        float t = Time.fixedTime - state.startTime;
 
         state.pools = new Dictionary<Refs, object>(32);
         InitializePools(playerSpec, true);
@@ -606,7 +647,7 @@ public class Entrypoint : MonoBehaviour
             SpawnRefs refs = enemySpawns[i];
             ref Spawn spawn = ref state.enemySpawns[i];
             spawn.refs = refs;
-            spawn.nextSpawnTime = t;
+            spawn.nextSpawnTime = 0;
             spawn.ships = new List<ShipRefs>(refs.spec.maxCount);
         }
 
@@ -680,12 +721,26 @@ public class Entrypoint : MonoBehaviour
 
         // NOTE: Simulate!
 
-        float t = Time.fixedTime;
+        float t = Time.fixedTime - state.startTime;
         float dt = Time.fixedDeltaTime;
 
         ShipRefs playerRefs = state.player.common.refs;
         ref PlayerShip player = ref state.player;
         ref MoveState playerMove = ref state.player.common.move;
+
+        // Win Condition
+        {
+            float timeLeft = surviveWinDuration - t;
+            if (timeLeft > 0.0f)
+            {
+                string text = string.Format("{0:0.00}", timeLeft);
+                instance.hudTimer.SetText(text);
+            }
+            else
+            {
+                StartCoroutine(GameWon());
+            }
+        }
 
         // Find Projectile Impacts
         Profiler.BeginSample("Find Projectile Impacts");
@@ -783,7 +838,7 @@ public class Entrypoint : MonoBehaviour
 
         Profiler.BeginSample("Ship Update");
         ProcessShipMovement(ref player.common);
-        ProcessShipWeapons(ref player.common);
+        ProcessShipWeapons(ref player.common, t);
 
         for (int i = 0; i < state.enemies.Count; i++)
         {
@@ -807,7 +862,7 @@ public class Entrypoint : MonoBehaviour
             input.shoot = Vector2.Angle(move.look, input.aim) < 22;
 
             ProcessShipMovement(ref enemy.common);
-            ProcessShipWeapons(ref enemy.common);
+            ProcessShipWeapons(ref enemy.common, t);
         }
         Profiler.EndSample();
 
@@ -914,6 +969,7 @@ public class Entrypoint : MonoBehaviour
                         // BUG: Floating point issues for large t
                         float timeStep = spec.timeToMaxSpawnRate / (spec.timeBetweenSpawns.Length - 1);
                         int spawnRateIndex = Mathf.FloorToInt(t / timeStep);
+                        Debug.LogFormat("Spawn Index: {0:0}", spawnRateIndex);
                         spawnRateIndex = Mathf.Min(spawnRateIndex, spec.timeBetweenSpawns.Length - 1);
                         spawn.nextSpawnTime += spec.timeBetweenSpawns[spawnRateIndex];
                         Vector3 pos = spawn.refs.transform.position + (Vector3) (5.0f * Random.insideUnitCircle);

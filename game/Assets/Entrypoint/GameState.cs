@@ -17,6 +17,7 @@ public enum MetaState
 public struct GameState
 {
     // Data
+    public float startTime;
     public PlayerShip player;
     public List<Projectile> projectiles;
     public RefList<ImpactEffect> impactEffects;
