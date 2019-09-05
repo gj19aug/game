@@ -13,11 +13,16 @@ MonoBehaviour:
   m_Name: Spawn_Enemy
   m_EditorClassIdentifier: 
   maxCount: 100
-  timeToMaxSpawnRate: 10
+  timeToMaxSpawnRate: 90
   timeBetweenSpawns:
+  - 10
+  - 8
+  - 6
+  - 4
+  - 3
   - 2
   ships:
-  - probability: 1
+  - probability: 0.65
     spec: {fileID: 11400000, guid: c26b0daa982e41940be3098c1c0d84d5, type: 2}
-  - probability: 1
+  - probability: 0.35
     spec: {fileID: 11400000, guid: 87876dc39855ef94bad05fc6c8b6d819, type: 2}

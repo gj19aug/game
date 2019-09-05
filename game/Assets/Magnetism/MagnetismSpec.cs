@@ -4,7 +4,7 @@
 public class MagnetismSpec : ScriptableObject
 {
     // TODO: This is actually going to change over time. Can't just be a constant.
-    [Range(0, 10)]
+    [Range(0, 20)]
     public float radius = 5;
 
     [Range(0, 1000)]

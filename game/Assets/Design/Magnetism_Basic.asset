@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 595820f0adb41d747a1406755bf19fe4, type: 3}
   m_Name: Magnetism_Basic
   m_EditorClassIdentifier: 
-  radius: 10
+  radius: 20
   strength: 400
   strengthCurve:
     serializedVersion: 2
