@@ -1,8 +1,8 @@
-/game/Library
-/game/Logs
-/game/Temp
-/game/obj
-/game/.vs
-/game/*.csproj
-/game/*.sln
+/mass-attraction/Library
+/mass-attraction/Logs
+/mass-attraction/Temp
+/mass-attraction/obj
+/mass-attraction/.vs
+/mass-attraction/*.csproj
+/mass-attraction/*.sln
 **.DS_Store
