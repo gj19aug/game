@@ -4,7 +4,6 @@ public class ResumeButton : MonoBehaviour
 {
     public void ResumeGame()
     {
-        Entrypoint.metaState = MetaState.Gameplay;
-        Time.timeScale = 1f;
+        Entrypoint.SetMetaState(MetaState.Gameplay);
     }
 }

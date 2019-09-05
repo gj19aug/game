@@ -14,9 +14,74 @@ public class Entrypoint : MonoBehaviour
     public SpawnRefs[] enemySpawns;
     public DebrisRefs[] debrisPrefabs;
 
+    public GameObject startMenu;
+    public GameObject startMenuTitle;
+    public GameObject startMenuStart;
+    public GameObject startMenuTryAgain;
+    public GameObject startMenuGameLost;
+    public GameObject pauseMenu;
+
     // Game State
     private GameState state;
-    public static MetaState metaState;
+
+    // ---------------------------------------------------------------------------------------------
+    // Meta State
+
+    public static MetaState metaState { get; private set; } = MetaState.StartMenu;
+    private static Entrypoint instance;
+
+    public static void SetMetaState(MetaState newState)
+    {
+        if (newState == metaState) return;
+        metaState = newState;
+
+        switch (metaState)
+        {
+            case MetaState.StartMenu:
+            {
+                Time.timeScale = 1f;
+                SceneManager.LoadScene(0, LoadSceneMode.Single);
+                instance.pauseMenu.SetActive(false);
+                instance = null;
+                gameOverRunning = false;
+                break;
+            }
+
+            case MetaState.HowToMenu:
+            {
+                break;
+            }
+
+            case MetaState.Gameplay:
+            {
+                Time.timeScale = 1f;
+                instance.pauseMenu.SetActive(false);
+                break;
+            }
+
+            case MetaState.Paused:
+            {
+                Time.timeScale = 0f;
+                instance.pauseMenu.SetActive(true);
+                break;
+            }
+
+            case MetaState.GameLost:
+            {
+                instance.startMenu.SetActive(true);
+                instance.startMenuTitle.SetActive(false);
+                instance.startMenuStart.SetActive(false);
+                instance.startMenuTryAgain.SetActive(true);
+                instance.startMenuGameLost.SetActive(true);
+                break;
+            }
+
+            case MetaState.GameWon:
+            {
+                break;
+            }
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------
     // Object Pooling
@@ -467,10 +532,13 @@ public class Entrypoint : MonoBehaviour
     // ---------------------------------------------------------------------------------------------
     // Game Flow
 
+    // HACK: Terrible.
+    private static bool gameOverRunning;
+
     IEnumerator GameOver(float damage)
     {
-        if (metaState == MetaState.GameLost) yield break;
-        metaState = MetaState.GameLost;
+        if (gameOverRunning) yield break;
+        gameOverRunning = true;
 
         float startTime = Time.unscaledTime;
 
@@ -496,6 +564,8 @@ public class Entrypoint : MonoBehaviour
             yield return new WaitForSecondsRealtime(0.0f);
         }
         Time.timeScale = 0.0f;
+
+        SetMetaState(MetaState.GameLost);
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -503,6 +573,8 @@ public class Entrypoint : MonoBehaviour
 
     void Awake()
     {
+        instance = this;
+
         float t = Time.fixedTime;
 
         state.pools = new Dictionary<Refs, object>(32);
@@ -582,11 +654,11 @@ public class Entrypoint : MonoBehaviour
         // Cheats
         input.cheatHealth = Input.GetKey(KeyCode.F1);
 
-        // HACK: Reset
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Application.isEditor)
         {
-            Time.timeScale = 1.0f;
-            SceneManager.LoadScene(0, LoadSceneMode.Single);
+            // Dev Reset
+            if (Input.GetKeyDown(KeyCode.R))
+                SetMetaState(MetaState.StartMenu);
         }
     }
 
