@@ -385,7 +385,7 @@ public class Entrypoint : MonoBehaviour
                 effect.refs.transform.rotation = Quaternion.identity;
                 effect.lifetime = 0.9f;
 
-                DespawnEnemy(ref e);
+                // Spawn Debris
                 float lerp = spec.debrisDistribution.Evaluate(Random.Range(0.0f, 1.0f));
                 float floatCount = Mathf.Lerp(spec.debrisDropped.min, spec.debrisDropped.max, lerp);
                 int count = Mathf.RoundToInt(floatCount);
@@ -396,6 +396,8 @@ public class Entrypoint : MonoBehaviour
                     Vector3 position = e.common.move.p + spec.debrisRange * impulseDir;
                     SpawnDebris(position, impulse, impulseDir);
                 }
+
+                DespawnEnemy(ref e);
             }
             Profiler.EndSample();
         }
@@ -969,7 +971,6 @@ public class Entrypoint : MonoBehaviour
                         // BUG: Floating point issues for large t
                         float timeStep = spec.timeToMaxSpawnRate / (spec.timeBetweenSpawns.Length - 1);
                         int spawnRateIndex = Mathf.FloorToInt(t / timeStep);
-                        Debug.LogFormat("Spawn Index: {0:0}", spawnRateIndex);
                         spawnRateIndex = Mathf.Min(spawnRateIndex, spec.timeBetweenSpawns.Length - 1);
                         spawn.nextSpawnTime += spec.timeBetweenSpawns[spawnRateIndex];
                         Vector3 pos = spawn.refs.transform.position + (Vector3) (5.0f * Random.insideUnitCircle);
