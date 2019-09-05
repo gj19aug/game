@@ -528,7 +528,7 @@ public class Entrypoint : MonoBehaviour
             SpawnRefs refs = enemySpawns[i];
             ref Spawn spawn = ref state.enemySpawns[i];
             spawn.refs = refs;
-            spawn.nextSpawnTime = t + 1.0f + refs.spec.timeBetweenSpawns[0];
+            spawn.nextSpawnTime = t;
             spawn.ships = new List<ShipRefs>(refs.spec.maxCount);
         }
 
