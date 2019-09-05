@@ -155,8 +155,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.000011444092, y: -25}
-  m_SizeDelta: {x: 501.3, y: 92.79999}
+  m_AnchoredPosition: {x: 0, y: -25}
+  m_SizeDelta: {x: 501, y: 93}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &43939629
 MonoBehaviour:
@@ -1960,8 +1960,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: -204.6}
-  m_SizeDelta: {x: 618.5, y: 94.6}
+  m_AnchoredPosition: {x: 0, y: -210}
+  m_SizeDelta: {x: 618, y: 80}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &431647911
 MonoBehaviour:
@@ -1983,9 +1983,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: Wreck your enemies by aiming your reticle in the desired direction, and
-    hold down the left mouse button to fire your projectiles. Navigate space using
-    WASD controls. You'll move relative to where your mouse is aiming.
+  m_text: Aim with the mouse. Hold left mouse button to shoot. Move with WASD.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 29268309066344239a6f3e72b8f11e59, type: 2}
   m_sharedMaterial: {fileID: -7560856895416022755, guid: 29268309066344239a6f3e72b8f11e59,
@@ -2055,12 +2053,12 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 431647911}
-    characterCount: 217
+    characterCount: 68
     spriteCount: 0
-    spaceCount: 35
-    wordCount: 36
+    spaceCount: 12
+    wordCount: 13
     linkCount: 0
-    lineCount: 4
+    lineCount: 2
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
@@ -2393,8 +2391,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 104.79999, y: -123.79999}
-  m_SizeDelta: {x: 154.20001, y: 57.200012}
+  m_AnchoredPosition: {x: 105, y: -124}
+  m_SizeDelta: {x: 154, y: 57}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &488564485
 GameObject:
@@ -2511,7 +2509,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: -150}
-  m_SizeDelta: {x: 618.45, y: 142.4}
+  m_SizeDelta: {x: 618, y: 142}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &509360425
 MonoBehaviour:
@@ -2533,10 +2531,13 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: "Want to win? You'll need to collect debris floating in space--mainly from
-    your fallen enemies. The more you collect, the bigger your ship will grow. \n\nTaking
-    damage from enemy fire or colliding will result in your ship losing pieces. Lose
-    it all, and you're done."
+  m_text: 'Collect debris from fallen enemies to reinforce your ship. Debris protects
+    you from getting hit. The more you collect, the larger and stronger your ship
+    becomes.
+
+
+    But! Taking damage will knock debris loose. If your ship takes a direct hit you''re
+    done.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 29268309066344239a6f3e72b8f11e59, type: 2}
   m_sharedMaterial: {fileID: -7560856895416022755, guid: 29268309066344239a6f3e72b8f11e59,
@@ -2606,10 +2607,10 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 509360425}
-    characterCount: 263
+    characterCount: 251
     spriteCount: 0
-    spaceCount: 46
-    wordCount: 45
+    spaceCount: 42
+    wordCount: 42
     linkCount: 0
     lineCount: 6
     pageCount: 1
@@ -3087,8 +3088,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -0.000011444092, y: -25}
-  m_SizeDelta: {x: 501.3, y: 92.79999}
+  m_AnchoredPosition: {x: 0, y: -25}
+  m_SizeDelta: {x: 501, y: 93}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &562128852
 MonoBehaviour:
@@ -3990,8 +3991,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 83.2, y: -97.399994}
-  m_SizeDelta: {x: 96.57, y: 96.571}
+  m_AnchoredPosition: {x: 83, y: -97}
+  m_SizeDelta: {x: 96, y: 96}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &663903768
 MonoBehaviour:
@@ -4067,7 +4068,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 672.7, y: 348.66}
+  m_SizeDelta: {x: 672, y: 348}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &672453352
 MonoBehaviour:
@@ -5589,8 +5590,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -0.000012398, y: 1}
-  m_SizeDelta: {x: 154.2, y: 2}
+  m_AnchoredPosition: {x: 0, y: 1}
+  m_SizeDelta: {x: 154, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1418261388
 GameObject:
@@ -6976,7 +6977,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -114, y: -98.3}
+  m_AnchoredPosition: {x: -114, y: -98}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1953417831
@@ -7128,7 +7129,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 672.7, y: 305.1}
+  m_SizeDelta: {x: 672, y: 305}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &2058445804
 MonoBehaviour:
