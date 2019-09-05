@@ -2,6 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum MetaState
+{
+    Null,
+    StartMenu,
+    HowToMenu,
+    Gameplay,
+    Paused,
+    GameLost,
+    GameWon,
+}
+
 [Serializable]
 public struct GameState
 {
@@ -96,6 +107,7 @@ public struct Impact
     public ShipRefs owner;
     public ShipRefs victim;
     public Vector3 position;
+    public Collider2D collider;
 }
 
 [Serializable]
