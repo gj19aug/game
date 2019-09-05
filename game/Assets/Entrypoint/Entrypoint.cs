@@ -11,6 +11,7 @@ public class Entrypoint : MonoBehaviour
     // Inspector
     public new CameraRefs camera;
     public ShipSpec playerSpec;
+    public Material playerShield;
     public SpawnRefs[] enemySpawns;
     public DebrisRefs[] debrisPrefabs;
 
@@ -41,6 +42,7 @@ public class Entrypoint : MonoBehaviour
             {
                 Time.timeScale = 1f;
                 SceneManager.LoadScene(0, LoadSceneMode.Single);
+                instance.playerShield.SetFloat("_DissolveValue", 0.0f);
                 instance.pauseMenu.SetActive(false);
                 instance = null;
                 gameOverRunning = false;
@@ -561,9 +563,11 @@ public class Entrypoint : MonoBehaviour
         {
             float normalizedTime = Mathf.Clamp01((nextTime - Time.unscaledTime) / duration);
             Time.timeScale = normalizedTime;
+            playerShield.SetFloat("_DissolveValue", 1.0f - normalizedTime);
             yield return new WaitForSecondsRealtime(0.0f);
         }
         Time.timeScale = 0.0f;
+        playerShield.SetFloat("_DissolveValue", 1.0f);
 
         SetMetaState(MetaState.GameLost);
     }
@@ -573,7 +577,9 @@ public class Entrypoint : MonoBehaviour
 
     void Awake()
     {
+        // HACK: Mad hacks!
         instance = this;
+        instance.playerShield.SetFloat("_DissolveValue", 0.0f);
 
         float t = Time.fixedTime;
 
